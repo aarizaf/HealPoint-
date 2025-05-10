@@ -1,0 +1,103 @@
+# Dependencias
+node_modules/
+.pnp/
+.pnp.js
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Testing
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+nosetests.xml
+coverage.xml
+
+# Producción y Build
+build/
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Logs y bases de datos
+*.log
+*.sqlite3
+*.db
+logs/
+*.swp
+
+# Archivos de configuración local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.local.json
+*.local.js
+*.local.py
+
+# Caché de IDE y editores
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+.vs/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+.cache/
+
+# Archivos específicos de React/Next.js
+.next/
+out/
+.vercel
+.nuxt
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos específicos de Python/Django/Flask
+*.so
+.Python
+celerybeat-schedule
+*.sage.py
+.scrapy
+.spyderproject
+.spyproject
+.ropeproject
+.webassets-cache
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Archivos grandes y binarios
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.mp4
+*.mov
+*.wmv
+*.avi
+*.psd
+*.ai
+*.sketch
+*.fig
+# (Agrega más extensiones según tu proyecto)
+
+# Directorios de caché
+.cache/
+.temp/
+.tmp/
