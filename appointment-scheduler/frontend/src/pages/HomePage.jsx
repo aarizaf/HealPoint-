@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import medicoImage from '../imgs/medicos.jpg';
-import './HomePage.css'; // Importa el CSS como un módulo
+import './HomePage.css';
 
-const HomePage = () => {
+const HomePage = ({ navigate }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  
   
   useEffect(() => {
     const handleResize = () => {
@@ -16,14 +15,21 @@ const HomePage = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
-  // SVG Icons as components
-  const ArrowRightIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5 12h14"></path>
-      <path d="M12 5l7 7-7 7"></path>
-    </svg>
-  );
+  // Efecto para cerrar el dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdown(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
   
+  // SVG Icons as components
   const CalendarIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -64,51 +70,160 @@ const HomePage = () => {
     </svg>
   );
 
+  // Menú actualizado con opciones relevantes para una plataforma de gestión de citas
+  const navOptions = [
+    { name: "Inicio", path: 'home' },
+    { 
+      name: "Servicios", 
+      path: 'servicios',
+      dropdown: true,
+      items: [
+    
+        { name: "Asignar cita medica", path: 'servicios/urgencias' },
+        { name: "Especialidades", path: 'servicios/especialidades' },
+        { name: "Exámenes", path: 'servicios/examenes' },
+        { name: "Tratamientos", path: 'servicios/tratamientos' }
+      ]
+    },
+    { 
+      name: "Doctores", 
+      path: 'doctores',
+      dropdown: true,
+      items: [
+        { name: "Directorio Médico", path: 'doctores/directorio' },
+        { name: "Especialistas", path: 'doctores/especialistas' },
+        { name: "Horarios", path: 'doctores/horarios' },
+        { name: "Calificaciones", path: 'doctores/calificaciones' }
+      ]
+    },
+ 
+    { 
+      name: "Pacientes", 
+      path: 'pacientes',
+      dropdown: true,
+      items: [
+        { name: "Portal del Paciente", path: 'pacientes/portal' },
+        { name: "Historial Médico", path: 'pacientes/historial' },
+        { name: "Próximas Citas", path: 'pacientes/citas' },
+        { name: "Medicamentos", path: 'pacientes/medicamentos' }
+      ]
+    },
+    { name: "Contacto", path: 'contacto' }
+  ];
+  
+  // Estado para los dropdowns
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const dropdownRef = useRef(null);
+
   // Features data array for better scalability
   const features = [
     {
       icon: <CalendarIcon />,
-      title: "Smart Scheduling",
-      description: "Intelligent calendar system that optimizes your availability and prevents double-booking."
+      title: "Programación Inteligente",
+      description: "Sistema de calendario inteligente que optimiza tu disponibilidad y evita reservas duplicadas."
     },
     {
       icon: <ClockIcon />,
-      title: "Time Management",
-      description: "Reduce no-shows with automated reminders and follow-up notifications."
+      title: "Gestión del Tiempo",
+      description: "Reduce las ausencias con recordatorios automáticos y notificaciones de seguimiento."
     },
     {
       icon: <UsersIcon />,
-      title: "Client Management",
-      description: "Store and access client information securely in one centralized location."
+      title: "Gestión de Pacientes",
+      description: "Almacena y accede a la información de los pacientes de forma segura en un lugar centralizado."
     }
   ];
+
+  const handleSignIn = () => {
+    navigate('login');
+  };
+
+  const handleSignUp = () => {
+    navigate('registro');
+  };
+  
+  const handleNavigate = (path) => {
+    navigate(path);
+  };
 
   return (
     <div className="container">
       {/* Navbar */}
       <nav className="navbar">
         <div className="navbarContent">
-          <div className="logo">
+          <div className="logo" onClick={() => navigate('home')} style={{cursor: 'pointer'}}>
             <div className="logoBox">H</div>
             <span className="logoText">HealPoint</span>
           </div>
           
           {/* Desktop Navigation */}
-          <div className={windowWidth > 768 ? "navLinks" : "navLinks d-none"}>
-            <button className="navLink">Features</button>
-            <button className="navLink">Pricing</button>
-            <button className="navLink">About</button>
+          <div className={windowWidth > 768 ? "navLinks" : "navLinks d-none"} ref={dropdownRef}>
+            {navOptions.map((option, index) => (
+              <div key={index} className="navItem">
+                <button 
+                  className={option.dropdown ? "navLink dropdownToggle" : "navLink"}
+                  onClick={() => {
+                    if (option.dropdown) {
+                      setOpenDropdown(openDropdown === index ? null : index);
+                    } else {
+                      handleNavigate(option.path);
+                    }
+                  }}
+                >
+                  {option.name}
+                  {option.dropdown && (
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      width="16" 
+                      height="16" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                      className={`dropdown-arrow ${openDropdown === index ? 'rotated' : ''}`}
+                    >
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  )}
+                </button>
+                
+                {option.dropdown && openDropdown === index && (
+                  <div className="dropdownMenu">
+                    {option.items.map((item, i) => (
+                      <button 
+                        key={i} 
+                        className="dropdownItem"
+                        onClick={() => {
+                          handleNavigate(item.path);
+                          setOpenDropdown(null);
+                        }}
+                      >
+                        {item.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
           
           {/* Auth Buttons */}
           <div className={windowWidth > 768 ? "authButtons" : "authButtons d-none"}>
-            <button className="signInButton">Login</button>
+            <button 
+              className="signInButton" 
+              onClick={handleSignIn}
+            >
+              Iniciar Sesión
+            </button>
             <button 
               className="signUpButton"
+              onClick={handleSignUp}
               onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#0ea271'}
               onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
             >
-              Sign Up
+              Registrarse
             </button>
           </div>
           
@@ -116,7 +231,7 @@ const HomePage = () => {
           <button 
             className={windowWidth <= 768 ? "mobileMenuButton" : "mobileMenuButton d-none"}
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
+            aria-label="Alternar menú"
           >
             {menuOpen ? <CloseIcon /> : <MenuIcon />}
           </button>
@@ -125,57 +240,84 @@ const HomePage = () => {
         {/* Mobile Navigation Menu */}
         {menuOpen && windowWidth <= 768 && (
           <div className="mobileNavLinks">
-            <button className="navLink mobileNavLink">Features</button>
-            <button className="navLink mobileNavLink">Pricing</button>
-            <button className="navLink mobileNavLink">About</button>
-            <button className="signInButton mobileNavLink">Login</button>
-            <button className="signUpButton mobileSignUpButton">
-              Sign Up
+            {navOptions.map((option, index) => (
+              <div key={index} className="mobileNavItem">
+                <button 
+                  className="navLink mobileNavLink"
+                  onClick={() => {
+                    if (option.dropdown) {
+                      setOpenDropdown(openDropdown === index ? null : index);
+                    } else {
+                      handleNavigate(option.path);
+                      setMenuOpen(false);
+                    }
+                  }}
+                >
+                  {option.name}
+                  {option.dropdown && (
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      width="16" 
+                      height="16" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                      className={`dropdown-arrow mobile ${openDropdown === index ? 'rotated' : ''}`}
+                    >
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  )}
+                </button>
+                
+                {option.dropdown && openDropdown === index && (
+                  <div className="mobileDropdownMenu">
+                    {option.items.map((item, i) => (
+                      <button 
+                        key={i} 
+                        className="mobileDropdownItem"
+                        onClick={() => {
+                          handleNavigate(item.path);
+                          setOpenDropdown(null);
+                          setMenuOpen(false);
+                        }}
+                      >
+                        {item.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+            <button 
+              className="signInButton mobileNavLink"
+              onClick={handleSignIn}
+            >
+              Iniciar Sesión
+            </button>
+            <button 
+              className="signUpButton mobileSignUpButton"
+              onClick={handleSignUp}
+            >
+              Registrarse
             </button>
           </div>
         )}
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - Eliminados los botones "Comenzar" y "Ver Demo" */}
       <div className="hero">
-        <h1 className="heroTitle">Appointment Management, Simplified</h1>
+        <h1 className="heroTitle">Gestión de Citas, Simplificada</h1>
         <p className="heroSubtitle">
-          HealPoint streamlines your appointment workflow with a modern, intuitive platform 
-          designed for healthcare professionals and service providers.
+          HealPoint optimiza su flujo de trabajo de citas con una plataforma moderna e intuitiva 
+          diseñada para profesionales de la salud y proveedores de servicios.
         </p>
-        
-        <div className={windowWidth > 640 ? "ctaButtons" : "ctaButtons column-mobile"}>
-          <button 
-            className={windowWidth > 640 ? "primaryButton" : "primaryButton full-width"}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#0ea271';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = '#10b981';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            Get Started <ArrowRightIcon />
-          </button>
-          <button 
-            className={windowWidth > 640 ? "secondaryButton" : "secondaryButton full-width"}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#f3f4f6';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = 'white';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            Watch Demo
-          </button>
-        </div>
         
         <img 
           src={medicoImage}
-          alt="HealPoint dashboard preview" 
+          alt="Vista previa del panel de HealPoint" 
           className="dashboardPreview"
           onMouseOver={(e) => {
             if (windowWidth > 768) {
@@ -193,9 +335,9 @@ const HomePage = () => {
       {/* Features Section */}
       <div className="featuresSection">
         <div className="featuresContent">
-          <h2 className="sectionTitle">Why Choose HealPoint</h2>
+          <h2 className="sectionTitle">¿Por qué elegir HealPoint?</h2>
           <p className="sectionDescription">
-            Designed with healthcare professionals in mind, our platform offers everything you need to streamline your appointment workflow.
+            Diseñada pensando en los profesionales de la salud, nuestra plataforma ofrece todo lo que necesitas para optimizar tu flujo de trabajo de citas.
           </p>
           
           <div className="featuresGrid">
@@ -234,7 +376,7 @@ const HomePage = () => {
             <div className="footerLogoBox">H</div>
             <span className="footerLogoText">HealPoint</span>
           </div>
-          <p className="copyright">© 2025 HealPoint. All rights reserved.</p>
+          <p className="copyright">© 2025 HealPoint. Todos los derechos reservados.</p>
         </div>
       </footer>
     </div>

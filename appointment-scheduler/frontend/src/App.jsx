@@ -1,21 +1,37 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import React, { useState } from 'react';
 import HomePage from './pages/HomePage';
-import AppointmentForm from './components/AppointmentForm';
-import AppointmentList from './components/AppointmentList';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 
-const App = () => {
-    return (
-        <Router>
-            <div>
-                <Switch>
-                    <Route path="/" exact component={HomePage} />
-                    <Route path="/appointments/new" component={AppointmentForm} />
-                    <Route path="/appointments" component={AppointmentList} />
-                </Switch>
-            </div>
-        </Router>
-    );
-};
+function App() {
+  const [currentPage, setCurrentPage] = useState('home');
+
+  // Función para navegar entre páginas
+  const navigate = (page) => {
+    setCurrentPage(page);
+    // Opcional: desplazarse hacia arriba al cambiar de página
+    window.scrollTo(0, 0);
+  };
+
+  // Renderizar la página correspondiente según el estado
+  const renderPage = () => {
+    switch(currentPage) {
+      case 'home':
+        return <HomePage navigate={navigate} />;
+      case 'login':
+        return <LoginPage navigate={navigate} />;
+      case 'registro':
+        return <RegisterPage navigate={navigate} />;
+      default:
+        return <HomePage navigate={navigate} />;
+    }
+  };
+
+  return (
+    <div className="app">
+      {renderPage()}
+    </div>
+  );
+}
 
 export default App;
