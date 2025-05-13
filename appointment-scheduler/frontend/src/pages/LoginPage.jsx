@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import medicoImage from '../imgs/medicos.jpg';
 import './AuthPages.css';
+import { checkAuthentication } from '../utils/auth';
 
 const LoginPage = ({ navigate }) => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,18 @@ const LoginPage = ({ navigate }) => {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Verificar si el usuario ya está autenticado al cargar la página
+  useEffect(() => {
+    const checkAuth = async () => {
+      const userData = await checkAuthentication();
+      if (userData) {
+        // El usuario ya está autenticado, redirigir al dashboard
+        navigate('dashboard');
+      }
+    };
+    checkAuth();
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -25,36 +38,52 @@ const LoginPage = ({ navigate }) => {
     setLoading(true);
     setError('');
     try {
-      console.log('Intentando iniciar sesión con:', formData);
-      await new Promise(r => setTimeout(r, 1000));
-      // navigate('dashboard');
-    } catch {
-      setError('Credenciales incorrectas. Verifica email y contraseña.');
+      const response = await fetch('http://localhost:8000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          correo: formData.email,
+          contraseña: formData.password,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.detail || 'Error al iniciar sesión');
+      }
+      
+      // Guardar token y datos del usuario
+      localStorage.setItem('healpoint_token', data.access_token);
+      localStorage.setItem('user_data', JSON.stringify(data.user_data));
+      
+      // Redirigir al dashboard
+      navigate('dashboard');
+    } catch (error) {
+      console.error('Error de inicio de sesión:', error);
+      setError(error.message || 'Credenciales incorrectas. Verifica email y contraseña.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = () => {
     setGoogleLoading(true);
     setError('');
-    try {
-      console.log('Iniciando sesión con Google...');
-      await new Promise(r => setTimeout(r, 1000));
-      // Aquí iría la lógica de autenticación con Google
-      // navigate('dashboard');
-    } catch (err) {
-      console.error('Error al iniciar sesión con Google:', err);
-      setError('No se pudo iniciar sesión con Google. Por favor intenta más tarde.');
-    } finally {
-      setGoogleLoading(false);
-    }
+    
+    // Redirigir al usuario al endpoint de autenticación de Google en el backend
+    window.location.href = 'http://localhost:8000/auth/google/login';
+    
+    // No necesitamos setGoogleLoading(false) aquí porque la página se recargará
   };
 
   const handleReturnHome = () => {
     navigate('home');
   };
 
+  // El resto de tu componente (JSX) permanece igual...
   return (
     <div className="authContainer">
       {/* Banner con imagen y overlay */}

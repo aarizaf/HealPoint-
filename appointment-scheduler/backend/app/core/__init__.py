@@ -1,1 +1,0 @@
-# This file is used to mark the core directory as a Python package.

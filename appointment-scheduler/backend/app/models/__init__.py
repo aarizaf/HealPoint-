@@ -1,1 +1,0 @@
-# This file is used to mark the models directory as a Python package.
