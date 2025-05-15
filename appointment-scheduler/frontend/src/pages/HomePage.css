@@ -1,5 +1,6 @@
 .container {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
   margin: 0;
   padding: 0;
   color: #333333;
@@ -8,7 +9,7 @@
 
 .navbar {
   background-color: #ffffff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 12px 0;
   position: sticky;
   top: 0;
@@ -62,7 +63,7 @@
   display: flex;
   flex-direction: column;
   padding: 16px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   max-height: 80vh;
   overflow-y: auto;
@@ -132,7 +133,7 @@
   min-width: 200px;
   background-color: #ffffff;
   border-radius: 6px;
-  box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   z-index: 1001;
   display: flex;
@@ -287,9 +288,39 @@
   max-width: 100%;
   height: auto;
   border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   transition: transform 0.3s ease;
   margin-top: 20px;
+}
+
+/* CTA Button */
+.heroCta {
+  margin-bottom: 2rem;
+}
+
+.ctaButton {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 1rem 2rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 6px 20px rgba(16,185,129,0.2);
+}
+
+.ctaButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(16,185,129,0.3);
+}
+
+.ctaButton:active {
+  transform: translateY(-1px);
 }
 
 .featuresSection {
@@ -331,7 +362,7 @@
   background-color: white;
   padding: 28px;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -391,6 +422,21 @@
   border-radius: 4px;
 }
 
+.logoutButton {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.logoutButton:hover {
+  background-color: #dc2626;
+}
+
 .footerLogoText {
   color: white;
   font-weight: 500;
@@ -399,6 +445,139 @@
 
 .copyright {
   font-size: 14px;
+}
+
+/* User profile section */
+.userProfile {
+  position: relative;
+}
+
+.userButton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: none;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 2rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.userButton:hover {
+  background-color: #f3f4f6;
+}
+
+.userAvatar {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.userName {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #111827;
+}
+
+/* User dropdown menu */
+.userMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 240px;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  overflow: hidden;
+  animation: fadeInDown 0.2s ease;
+  z-index: 1001;
+}
+
+.userMenuHeader {
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.userMenuEmail {
+  font-size: 0.85rem;
+  color: #6B7280;
+  word-break: break-all;
+}
+
+.userMenuDivider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 0.25rem 0;
+}
+
+.userMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  background: none;
+  border: none;
+  color: #374151;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.userMenuItem:hover {
+  background-color: #f3f4f6;
+  color: #10B981;
+}
+
+.logoutMenuItem {
+  color: #EF4444;
+}
+
+.logoutMenuItem:hover {
+  background-color: #FEF2F2;
+  color: #DC2626;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile user menu */
+.mobileUserSection {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.mobileUserHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.mobileMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* Clases de utilidad */
@@ -425,6 +604,11 @@
 
   .mobileMenuButton {
     display: block;
+  }
+  
+  .ctaButton {
+    width: 100%;
+    justify-content: center;
   }
 }
 

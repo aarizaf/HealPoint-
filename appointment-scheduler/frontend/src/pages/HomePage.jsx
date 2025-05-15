@@ -1,149 +1,362 @@
-import React, { useState, useEffect, useRef } from 'react';
-import medicoImage from '../imgs/medicos.jpg';
-import './HomePage.css';
+import React, { useState, useEffect, useRef } from "react";
+import medicoImage from "../imgs/medicos.jpg";
+import "./HomePage.css";
 
-const HomePage = ({ navigate }) => {
+const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  
+  const [userEmail, setUserEmail] = useState("");
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const [openDropdown, setOpenDropdown] = useState(null);
+
   useEffect(() => {
+    // Get user email from localStorage if logged in
+    if (isLoggedIn) {
+      const email = localStorage.getItem("userEmail") || "Usuario";
+      setUserEmail(email);
+    }
+    
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-  
-  // Efecto para cerrar el dropdown al hacer clic fuera
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isLoggedIn]);
+
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOpenDropdown(null);
       }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setUserMenuOpen(false);
+      }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  
-  // SVG Icons as components
+
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userEmail");
+    setIsLoggedIn(false);
+    setUserMenuOpen(false);
+    navigate("home");
+  };
+
+  // Icons as components
   const CalendarIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
       <line x1="16" y1="2" x2="16" y2="6"></line>
       <line x1="8" y1="2" x2="8" y2="6"></line>
       <line x1="3" y1="10" x2="21" y2="10"></line>
     </svg>
   );
-  
+
   const ClockIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <circle cx="12" cy="12" r="10"></circle>
       <polyline points="12 6 12 12 16 14"></polyline>
     </svg>
   );
-  
+
   const UsersIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
       <circle cx="9" cy="7" r="4"></circle>
       <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
       <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
     </svg>
   );
-  
+
   const MenuIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <line x1="3" y1="12" x2="21" y2="12"></line>
       <line x1="3" y1="6" x2="21" y2="6"></line>
       <line x1="3" y1="18" x2="21" y2="18"></line>
     </svg>
   );
-  
+
   const CloseIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <line x1="18" y1="6" x2="6" y2="18"></line>
       <line x1="6" y1="6" x2="18" y2="18"></line>
     </svg>
   );
 
-  // Menú actualizado con opciones relevantes para una plataforma de gestión de citas
+  // Updated with options relevant for appointment management platform
   const navOptions = [
-    { name: "Inicio", path: 'home' },
-    { 
-      name: "Servicios", 
-      path: 'servicios',
+    { name: "Inicio", path: "home" },
+    {
+      name: "Servicios",
+      path: "servicios",
       dropdown: true,
       items: [
-    
-        { name: "Asignar cita medica", path: 'servicios/urgencias' },
-        { name: "Especialidades", path: 'servicios/especialidades' },
-        { name: "Exámenes", path: 'servicios/examenes' },
-        { name: "Tratamientos", path: 'servicios/tratamientos' }
-      ]
+        { name: "Asignar cita médica", path: "servicios/urgencias" },
+        { name: "Especialidades", path: "servicios/especialidades" },
+        { name: "Exámenes", path: "servicios/examenes" },
+        { name: "Tratamientos", path: "servicios/tratamientos" },
+      ],
     },
-    { 
-      name: "Doctores", 
-      path: 'doctores',
+    {
+      name: "Doctores",
+      path: "doctores",
       dropdown: true,
       items: [
-        { name: "Directorio Médico", path: 'doctores/directorio' },
-        { name: "Especialistas", path: 'doctores/especialistas' },
-        { name: "Horarios", path: 'doctores/horarios' },
-        { name: "Calificaciones", path: 'doctores/calificaciones' }
-      ]
+        { name: "Directorio Médico", path: "doctores/directorio" },
+        { name: "Especialistas", path: "doctores/especialistas" },
+        { name: "Horarios", path: "doctores/horarios" },
+        { name: "Calificaciones", path: "doctores/calificaciones" },
+      ],
     },
- 
-    { 
-      name: "Pacientes", 
-      path: 'pacientes',
+    {
+      name: "Pacientes",
+      path: "pacientes",
       dropdown: true,
       items: [
-        { name: "Portal del Paciente", path: 'pacientes/portal' },
-        { name: "Historial Médico", path: 'pacientes/historial' },
-        { name: "Próximas Citas", path: 'pacientes/citas' },
-        { name: "Medicamentos", path: 'pacientes/medicamentos' }
-      ]
+        { name: "Portal del Paciente", path: "pacientes/portal" },
+        { name: "Historial Médico", path: "pacientes/historial" },
+        { name: "Próximas Citas", path: "pacientes/citas" },
+        { name: "Medicamentos", path: "pacientes/medicamentos" },
+      ],
     },
-    { name: "Contacto", path: 'contacto' }
+    { name: "Contacto", path: "contacto" },
   ];
-  
-  // Estado para los dropdowns
-  const [openDropdown, setOpenDropdown] = useState(null);
-  const dropdownRef = useRef(null);
 
   // Features data array for better scalability
   const features = [
     {
       icon: <CalendarIcon />,
       title: "Programación Inteligente",
-      description: "Sistema de calendario inteligente que optimiza tu disponibilidad y evita reservas duplicadas."
+      description:
+        "Sistema de calendario inteligente que optimiza tu disponibilidad y evita reservas duplicadas.",
     },
     {
       icon: <ClockIcon />,
       title: "Gestión del Tiempo",
-      description: "Reduce las ausencias con recordatorios automáticos y notificaciones de seguimiento."
+      description:
+        "Reduce las ausencias con recordatorios automáticos y notificaciones de seguimiento.",
     },
     {
       icon: <UsersIcon />,
       title: "Gestión de Pacientes",
-      description: "Almacena y accede a la información de los pacientes de forma segura en un lugar centralizado."
-    }
+      description:
+        "Almacena y accede a la información de los pacientes de forma segura en un lugar centralizado.",
+    },
   ];
 
-  const handleSignIn = () => {
-    navigate('login');
+  // Check if user is logged in before navigating to protected routes
+  const handleNavigate = (path) => {
+    // List of paths that require authentication
+    const protectedPaths = [
+      'servicios/urgencias',
+      'servicios/especialidades',
+      'servicios/examenes',
+      'servicios/tratamientos',
+      'doctores/directorio',
+      'doctores/especialistas',
+      'doctores/horarios',
+      'doctores/calificaciones',
+      'pacientes/portal',
+      'pacientes/historial',
+      'pacientes/citas',
+      'pacientes/medicamentos',
+    ];
+    
+    // If path is protected and user is not logged in, redirect to login
+    if (protectedPaths.includes(path) && !isLoggedIn) {
+      navigate("login");
+    } else {
+      navigate(path);
+    }
   };
 
-  const handleSignUp = () => {
-    navigate('registro');
+  // Helper function to get a nice display name from email
+  const getUserDisplayName = () => {
+    if (!userEmail) return "Usuario";
+    
+    // If email contains @, get the part before @
+    if (userEmail.includes('@')) {
+      const name = userEmail.split('@')[0];
+      // Capitalize first letter
+      return name.charAt(0).toUpperCase() + name.slice(1);
+    }
+    
+    return userEmail;
   };
-  
-  const handleNavigate = (path) => {
-    navigate(path);
+
+  // Render user profile or login/register buttons
+  const renderAuthSection = () => {
+    if (isLoggedIn) {
+      return (
+        <div 
+          className={windowWidth > 768 ? "userProfile" : "userProfile d-none"}
+          ref={userMenuRef}
+        >
+          <button 
+            className="userButton" 
+            onClick={() => setUserMenuOpen(!userMenuOpen)}
+          >
+            <div className="userAvatar">
+              {userEmail.charAt(0).toUpperCase()}
+            </div>
+            <span className="userName">{getUserDisplayName()}</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={`dropdown-arrow ${userMenuOpen ? "rotated" : ""}`}
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          
+          {userMenuOpen && (
+            <div className="userMenu">
+              <div className="userMenuHeader">
+                <span className="userMenuEmail">{userEmail}</span>
+              </div>
+              <div className="userMenuDivider"></div>
+              <button className="userMenuItem" onClick={() => handleNavigate('perfil')}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Mi Perfil
+              </button>
+              <button className="userMenuItem" onClick={() => handleNavigate('pacientes/citas')}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                Mis Citas
+              </button>
+              <div className="userMenuDivider"></div>
+              <button className="userMenuItem logoutMenuItem" onClick={handleLogout}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Cerrar Sesión
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    } else {
+      return (
+        <div className={windowWidth > 768 ? "authButtons" : "authButtons d-none"}>
+          <button className="signInButton" onClick={() => navigate("login")}>
+            Iniciar Sesión
+          </button>
+          <button
+            className="signUpButton"
+            onClick={() => navigate("registro")}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#0ea271")}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#10b981")}
+          >
+            Registrarse
+          </button>
+        </div>
+      );
+    }
   };
 
   return (
@@ -151,17 +364,25 @@ const HomePage = ({ navigate }) => {
       {/* Navbar */}
       <nav className="navbar">
         <div className="navbarContent">
-          <div className="logo" onClick={() => navigate('home')} style={{cursor: 'pointer'}}>
+          <div
+            className="logo"
+            onClick={() => navigate("home")}
+            style={{ cursor: "pointer" }}
+          >
             <div className="logoBox">H</div>
             <span className="logoText">HealPoint</span>
           </div>
-          
           {/* Desktop Navigation */}
-          <div className={windowWidth > 768 ? "navLinks" : "navLinks d-none"} ref={dropdownRef}>
+          <div
+            className={windowWidth > 768 ? "navLinks" : "navLinks d-none"}
+            ref={dropdownRef}
+          >
             {navOptions.map((option, index) => (
               <div key={index} className="navItem">
-                <button 
-                  className={option.dropdown ? "navLink dropdownToggle" : "navLink"}
+                <button
+                  className={
+                    option.dropdown ? "navLink dropdownToggle" : "navLink"
+                  }
                   onClick={() => {
                     if (option.dropdown) {
                       setOpenDropdown(openDropdown === index ? null : index);
@@ -172,28 +393,30 @@ const HomePage = ({ navigate }) => {
                 >
                   {option.name}
                   {option.dropdown && (
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      width="16" 
-                      height="16" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
-                      className={`dropdown-arrow ${openDropdown === index ? 'rotated' : ''}`}
+                      className={`dropdown-arrow ${
+                        openDropdown === index ? "rotated" : ""
+                      }`}
                     >
                       <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                   )}
                 </button>
-                
+
                 {option.dropdown && openDropdown === index && (
                   <div className="dropdownMenu">
                     {option.items.map((item, i) => (
-                      <button 
-                        key={i} 
+                      <button
+                        key={i}
                         className="dropdownItem"
                         onClick={() => {
                           handleNavigate(item.path);
@@ -209,40 +432,29 @@ const HomePage = ({ navigate }) => {
             ))}
           </div>
           
-          {/* Auth Buttons */}
-          <div className={windowWidth > 768 ? "authButtons" : "authButtons d-none"}>
-            <button 
-              className="signInButton" 
-              onClick={handleSignIn}
-            >
-              Iniciar Sesión
-            </button>
-            <button 
-              className="signUpButton"
-              onClick={handleSignUp}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#0ea271'}
-              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
-            >
-              Registrarse
-            </button>
-          </div>
+          {/* Replace with the new auth section */}
+          {renderAuthSection()}
           
           {/* Mobile Menu Button */}
-          <button 
-            className={windowWidth <= 768 ? "mobileMenuButton" : "mobileMenuButton d-none"}
+          <button
+            className={
+              windowWidth <= 768
+                ? "mobileMenuButton"
+                : "mobileMenuButton d-none"
+            }
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Alternar menú"
           >
             {menuOpen ? <CloseIcon /> : <MenuIcon />}
           </button>
         </div>
-        
+
         {/* Mobile Navigation Menu */}
         {menuOpen && windowWidth <= 768 && (
           <div className="mobileNavLinks">
             {navOptions.map((option, index) => (
               <div key={index} className="mobileNavItem">
-                <button 
+                <button
                   className="navLink mobileNavLink"
                   onClick={() => {
                     if (option.dropdown) {
@@ -255,28 +467,30 @@ const HomePage = ({ navigate }) => {
                 >
                   {option.name}
                   {option.dropdown && (
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      width="16" 
-                      height="16" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
-                      className={`dropdown-arrow mobile ${openDropdown === index ? 'rotated' : ''}`}
+                      className={`dropdown-arrow mobile ${
+                        openDropdown === index ? "rotated" : ""
+                      }`}
                     >
                       <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                   )}
                 </button>
-                
+
                 {option.dropdown && openDropdown === index && (
                   <div className="mobileDropdownMenu">
                     {option.items.map((item, i) => (
-                      <button 
-                        key={i} 
+                      <button
+                        key={i}
                         className="mobileDropdownItem"
                         onClick={() => {
                           handleNavigate(item.path);
@@ -291,42 +505,95 @@ const HomePage = ({ navigate }) => {
                 )}
               </div>
             ))}
-            <button 
-              className="signInButton mobileNavLink"
-              onClick={handleSignIn}
-            >
-              Iniciar Sesión
-            </button>
-            <button 
-              className="signUpButton mobileSignUpButton"
-              onClick={handleSignUp}
-            >
-              Registrarse
-            </button>
+            
+            {/* Add user information for logged in users */}
+            {isLoggedIn ? (
+              <div className="mobileUserSection">
+                <div className="mobileUserHeader">
+                  <div className="userAvatar">
+                    {userEmail.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="userMenuEmail">{userEmail}</span>
+                </div>
+                
+                <button className="mobileNavLink mobileMenuItem" onClick={() => {
+                  handleNavigate('perfil');
+                  setMenuOpen(false);
+                }}>
+                  Mi Perfil
+                </button>
+                
+                <button className="mobileNavLink mobileMenuItem" onClick={() => {
+                  handleNavigate('pacientes/citas');
+                  setMenuOpen(false);
+                }}>
+                  Mis Citas
+                </button>
+                
+                <button className="mobileNavLink logoutButton" onClick={() => {
+                  handleLogout();
+                  setMenuOpen(false);
+                }}>
+                  Cerrar Sesión
+                </button>
+              </div>
+            ) : (
+              <>
+                <button
+                  className="signInButton mobileNavLink"
+                  onClick={() => navigate("login")}
+                >
+                  Iniciar Sesión
+                </button>
+                <button
+                  className="signUpButton mobileSignUpButton"
+                  onClick={() => navigate("registro")}
+                >
+                  Registrarse
+                </button>
+              </>
+            )}
           </div>
         )}
       </nav>
 
-      {/* Hero Section - Eliminados los botones "Comenzar" y "Ver Demo" */}
+      {/* Hero Section */}
       <div className="hero">
         <h1 className="heroTitle">Gestión de Citas, Simplificada</h1>
         <p className="heroSubtitle">
-          HealPoint optimiza su flujo de trabajo de citas con una plataforma moderna e intuitiva 
-          diseñada para profesionales de la salud y proveedores de servicios.
+          HealPoint optimiza su flujo de trabajo de citas con una plataforma
+          moderna e intuitiva diseñada para profesionales de la salud y
+          proveedores de servicios.
         </p>
-        
-        <img 
+
+        {/* Añadir botón de acción principal */}
+        <div className="heroCta">
+          <button 
+            className="ctaButton"
+            onClick={() => handleNavigate('servicios/urgencias')}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            Agendar Cita Médica
+          </button>
+        </div>
+
+        <img
           src={medicoImage}
-          alt="Vista previa del panel de HealPoint" 
+          alt="Vista previa del panel de HealPoint"
           className="dashboardPreview"
           onMouseOver={(e) => {
             if (windowWidth > 768) {
-              e.currentTarget.style.transform = 'scale(1.02)';
+              e.currentTarget.style.transform = "scale(1.02)";
             }
           }}
           onMouseOut={(e) => {
             if (windowWidth > 768) {
-              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.transform = "scale(1)";
             }
           }}
         />
@@ -337,30 +604,32 @@ const HomePage = ({ navigate }) => {
         <div className="featuresContent">
           <h2 className="sectionTitle">¿Por qué elegir HealPoint?</h2>
           <p className="sectionDescription">
-            Diseñada pensando en los profesionales de la salud, nuestra plataforma ofrece todo lo que necesitas para optimizar tu flujo de trabajo de citas.
+            Diseñada pensando en los profesionales de la salud, nuestra
+            plataforma ofrece todo lo que necesitas para optimizar tu flujo de
+            trabajo de citas.
           </p>
-          
+
           <div className="featuresGrid">
             {features.map((feature, index) => (
-              <div 
+              <div
                 key={index}
                 className="featureCard"
                 onMouseOver={(e) => {
                   if (windowWidth > 768) {
-                    e.currentTarget.style.transform = 'translateY(-5px)';
-                    e.currentTarget.style.boxShadow = '0 10px 15px rgba(0,0,0,0.1)';
+                    e.currentTarget.style.transform = "translateY(-5px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 10px 15px rgba(0,0,0,0.1)";
                   }
                 }}
                 onMouseOut={(e) => {
                   if (windowWidth > 768) {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.05)';
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 6px rgba(0,0,0,0.05)";
                   }
                 }}
               >
-                <div className="featureIcon">
-                  {feature.icon}
-                </div>
+                <div className="featureIcon">{feature.icon}</div>
                 <h3 className="featureTitle">{feature.title}</h3>
                 <p className="featureDescription">{feature.description}</p>
               </div>
@@ -371,12 +640,18 @@ const HomePage = ({ navigate }) => {
 
       {/* Footer */}
       <footer className="footer">
-        <div className={windowWidth > 640 ? "footerContent" : "footerContent column-mobile"}>
+        <div
+          className={
+            windowWidth > 640 ? "footerContent" : "footerContent column-mobile"
+          }
+        >
           <div className="footerLogo">
             <div className="footerLogoBox">H</div>
             <span className="footerLogoText">HealPoint</span>
           </div>
-          <p className="copyright">© 2025 HealPoint. Todos los derechos reservados.</p>
+          <p className="copyright">
+            © 2025 HealPoint. Todos los derechos reservados.
+          </p>
         </div>
       </footer>
     </div>

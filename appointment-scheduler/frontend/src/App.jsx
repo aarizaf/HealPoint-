@@ -2,74 +2,37 @@ import React, { useState, useEffect } from 'react';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import AuthCallbackPage from './pages/AuthCallbackPage';
-import { checkAuthentication } from './utils/auth';
-
-// Componente para rutas protegidas
-const ProtectedRoute = ({ component: Component, navigate }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-  const [userData, setUserData] = useState(null);
-
-  useEffect(() => {
-    const verifyAuth = async () => {
-      const data = await checkAuthentication();
-      if (data) {
-        setIsAuthenticated(true);
-        setUserData(data);
-      } else {
-        navigate('login');
-      }
-    };
-    
-    verifyAuth();
-  }, [navigate]);
-  
-  if (isAuthenticated === null) {
-    // Estado de carga mientras se verifica
-    return (
-      <div className="loadingPage">
-        <div className="loadingSpinner">
-          <svg className="spinner" viewBox="0 0 24 24">
-            <circle className="spinnerPath" cx="12" cy="12" r="10" fill="none" strokeWidth="3"></circle>
-          </svg>
-        </div>
-        <p>Cargando...</p>
-      </div>
-    );
-  }
-  
-  return isAuthenticated ? <Component navigate={navigate} userData={userData} /> : null;
-};
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentRoute, setCurrentRoute] = useState('home');
 
-  // Función para navegar entre páginas
-  const navigate = (page) => {
-    setCurrentPage(page);
-    // Opcional: desplazarse hacia arriba al cambiar de página
+  // Check for existing login when app loads
+  useEffect(() => {
+    const storedLoginStatus = localStorage.getItem('isLoggedIn');
+    if (storedLoginStatus === 'true') {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  // Navigation function
+  const navigate = (route) => {
+    setCurrentRoute(route);
+    // Scroll to top when navigating
     window.scrollTo(0, 0);
   };
 
-  // Renderizar la página correspondiente según el estado
-  const renderPage = () => {
-    switch(currentPage) {
+  // Render the appropriate component based on the current route
+  const renderRoute = () => {
+    switch(currentRoute) {
       case 'home':
-        return <HomePage navigate={navigate} />;
+        return <HomePage navigate={navigate} isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />;
       case 'login':
-        return <LoginPage navigate={navigate} />;
+        return <LoginPage navigate={navigate} setIsLoggedIn={setIsLoggedIn} />;
       case 'registro':
         return <RegisterPage navigate={navigate} />;
-      case 'auth-callback':
-        return <AuthCallbackPage navigate={navigate} />;
-      case 'dashboard':
-        // Usar ProtectedRoute para la ruta de dashboard
-        return <ProtectedRoute 
-          component={(props) => <div>Dashboard Page (por implementar)</div>} 
-          navigate={navigate} 
-        />;
       default:
-        return <HomePage navigate={navigate} />;
+        return <HomePage navigate={navigate} isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />;
     }
   };
 
@@ -88,8 +51,8 @@ function App() {
   }, []);
 
   return (
-    <div className="app">
-      {renderPage()}
+    <div className="App">
+      {renderRoute()}
     </div>
   );
 }
