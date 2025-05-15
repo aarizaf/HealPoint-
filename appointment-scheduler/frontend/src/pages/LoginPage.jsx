@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import medicoImage from "../imgs/medicos.jpg";
 import "./AuthPages.css";
-import HomePage from "./HomePage";
 
 const LoginPage = ({ navigate, setIsLoggedIn }) => {
   const [formData, setFormData] = useState({
@@ -28,7 +27,7 @@ const LoginPage = ({ navigate, setIsLoggedIn }) => {
     try {
       console.log("Intentando iniciar sesión con:", formData);
 
-      // simula la espera del servidor
+      // Simula la espera del servidor
       await new Promise((r) => setTimeout(r, 1000));
       const validEmail = "test@demo.com";
       const validPassword = "12344";
@@ -37,13 +36,18 @@ const LoginPage = ({ navigate, setIsLoggedIn }) => {
         formData.email === validEmail &&
         formData.password === validPassword
       ) {
+        // Store both login state and user email
         localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userEmail", formData.email);
         setIsLoggedIn(true);
         navigate("home");
       } else {
-        setError("Credenciales incorrectas. Verifica email y contraseña.");
+        // For demo purposes, accept any credentials
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userEmail", formData.email);
+        setIsLoggedIn(true);
+        navigate("home");
       }
-      // navigate('dashboard');
     } catch {
       setError("Credenciales incorrectas. Verifica email y contraseña.");
     } finally {
@@ -78,7 +82,7 @@ const LoginPage = ({ navigate, setIsLoggedIn }) => {
       {/* Banner con imagen y overlay */}
       <div className="authBanner">
         <img src={medicoImage} alt="Médicos" />
-        <div className="bannerOverlay" />
+        <div className="bannerOverlay"></div>
       </div>
 
       {/* Card de autenticación */}

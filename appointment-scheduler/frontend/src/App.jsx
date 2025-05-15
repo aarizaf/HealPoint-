@@ -1,50 +1,50 @@
-import React, { useState } from "react";
-import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
+import React, { useState, useEffect } from 'react';
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import MedicalAppointment from './pages/MedicalAppointment';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("home");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentRoute, setCurrentRoute] = useState('home');
 
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return localStorage.getItem("isLoggedIn") === "true";
-  });
-  //const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Check for existing login when app loads
+  useEffect(() => {
+    const storedLoginStatus = localStorage.getItem('isLoggedIn');
+    if (storedLoginStatus === 'true') {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
-  // Función para navegar entre páginas
-  const navigate = (page) => {
-    setCurrentPage(page);
-    // Opcional: desplazarse hacia arriba al cambiar de página
+  // Navigation function
+  const navigate = (route) => {
+    setCurrentRoute(route);
+    // Scroll to top when navigating
     window.scrollTo(0, 0);
   };
 
-  // Renderizar la página correspondiente según el estado
-  const renderPage = () => {
-    switch (currentPage) {
-      case "home":
-        return (
-          <HomePage
-            navigate={navigate}
-            isLoggedIn={isLoggedIn}
-            setIsLoggedIn={setIsLoggedIn}
-          />
-        );
-      case "login":
+  // Render the appropriate component based on the current route
+  const renderRoute = () => {
+    switch(currentRoute) {
+      case 'home':
+        return <HomePage navigate={navigate} isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />;
+      case 'login':
         return <LoginPage navigate={navigate} setIsLoggedIn={setIsLoggedIn} />;
-      case "registro":
+      case 'registro':
         return <RegisterPage navigate={navigate} />;
+      case 'servicios/urgencias':
+        return <MedicalAppointment navigate={navigate} isLoggedIn={isLoggedIn} />;
+      // Add other routes here
       default:
-        return (
-          <HomePage
-            navigate={navigate}
-            isLoggedIn={isLoggedIn}
-            setIsLoggedIn={setIsLoggedIn}
-          />
-        );
+        return <HomePage navigate={navigate} isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />;
     }
   };
 
-  return <div className="app">{renderPage()}</div>;
+  return (
+    <div className="App">
+      {renderRoute()}
+    </div>
+  );
 }
 
 export default App;
