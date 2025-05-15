@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import MedicalAppointment from './pages/MedicalAppointment';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -31,24 +32,13 @@ function App() {
         return <LoginPage navigate={navigate} setIsLoggedIn={setIsLoggedIn} />;
       case 'registro':
         return <RegisterPage navigate={navigate} />;
+      case 'servicios/urgencias':
+        return <MedicalAppointment navigate={navigate} isLoggedIn={isLoggedIn} />;
+      // Add other routes here
       default:
         return <HomePage navigate={navigate} isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />;
     }
   };
-
-  // Verificar si hay un parámetro auth-callback en la URL para manejar el retorno de Google OAuth
-  useEffect(() => {
-    const path = window.location.pathname;
-    if (path.includes('auth-callback')) {
-      setCurrentPage('auth-callback');
-    } else if (path.includes('login')) {
-      setCurrentPage('login');
-    } else if (path.includes('registro')) {
-      setCurrentPage('registro');
-    } else if (path.includes('dashboard')) {
-      setCurrentPage('dashboard');
-    }
-  }, []);
 
   return (
     <div className="App">

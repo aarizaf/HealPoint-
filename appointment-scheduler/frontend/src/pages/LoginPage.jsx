@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import medicoImage from '../imgs/medicos.jpg';
-import './AuthPages.css';
+import React, { useState } from "react";
+import medicoImage from "../imgs/medicos.jpg";
+import "./AuthPages.css";
 
 const LoginPage = ({ navigate, setIsLoggedIn }) => {
   const [formData, setFormData] = useState({
@@ -10,7 +10,7 @@ const LoginPage = ({ navigate, setIsLoggedIn }) => {
   });
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -25,27 +25,49 @@ const LoginPage = ({ navigate, setIsLoggedIn }) => {
     setLoading(true);
     setError("");
     try {
-      console.log('Intentando iniciar sesión con:', formData);
-      await new Promise(r => setTimeout(r, 1000));
-      // navigate('dashboard');
+      console.log("Intentando iniciar sesión con:", formData);
+
+      // Simula la espera del servidor
+      await new Promise((r) => setTimeout(r, 1000));
+      const validEmail = "test@demo.com";
+      const validPassword = "12344";
+
+      if (
+        formData.email === validEmail &&
+        formData.password === validPassword
+      ) {
+        // Store both login state and user email
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userEmail", formData.email);
+        setIsLoggedIn(true);
+        navigate("home");
+      } else {
+        // For demo purposes, accept any credentials
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userEmail", formData.email);
+        setIsLoggedIn(true);
+        navigate("home");
+      }
     } catch {
-      setError('Credenciales incorrectas. Verifica email y contraseña.');
+      setError("Credenciales incorrectas. Verifica email y contraseña.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoogleSignIn = () => {
+  const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
-    setError('');
+    setError("");
     try {
-      console.log('Iniciando sesión con Google...');
-      await new Promise(r => setTimeout(r, 1000));
+      console.log("Iniciando sesión con Google...");
+      await new Promise((r) => setTimeout(r, 1000));
       // Aquí iría la lógica de autenticación con Google
       // navigate('dashboard');
     } catch (err) {
-      console.error('Error al iniciar sesión con Google:', err);
-      setError('No se pudo iniciar sesión con Google. Por favor intenta más tarde.');
+      console.error("Error al iniciar sesión con Google:", err);
+      setError(
+        "No se pudo iniciar sesión con Google. Por favor intenta más tarde."
+      );
     } finally {
       setGoogleLoading(false);
     }
@@ -55,7 +77,6 @@ const LoginPage = ({ navigate, setIsLoggedIn }) => {
     navigate("home");
   };
 
-  // El resto de tu componente (JSX) permanece igual...
   return (
     <div className="authContainer">
       {/* Banner con imagen y overlay */}

@@ -68,3 +68,28 @@ class HorarioSlotResponse(BaseModel):
 
     class Config:
         from_attributes = True
+        
+
+# Añadir estos esquemas a tu archivo de schemas.py
+
+class PacienteBase(BaseModel):
+    fecha_nacimiento: Optional[date] = None
+    genero: Optional[str] = None
+    telefono: Optional[str] = None
+
+class PacienteCreate(PacienteBase):
+    # Datos del usuario asociado
+    nombre: str
+    correo: str
+    contraseña: str
+    cedula: Optional[str] = None
+    
+class PacienteResponse(PacienteBase):
+    id_paciente: int
+    id_usuario: int
+    
+    # Datos del usuario
+    usuario: Optional[UsuarioResponse] = None
+    
+    class Config:
+        from_attributes = True
