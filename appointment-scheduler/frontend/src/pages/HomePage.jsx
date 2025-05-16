@@ -10,6 +10,11 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
   const userMenuRef = useRef(null);
   const dropdownRef = useRef(null);
   const [openDropdown, setOpenDropdown] = useState(null);
+  const especialidadesRef = useRef(null);
+
+  const scrollToEspecialidades = () => {
+    especialidadesRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
     // Get user email from localStorage if logged in
@@ -17,7 +22,7 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
       const email = localStorage.getItem("userEmail") || "Usuario";
       setUserEmail(email);
     }
-    
+
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
@@ -207,21 +212,26 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
   const handleNavigate = (path) => {
     // List of paths that require authentication
     const protectedPaths = [
-      'servicios/urgencias',
-      'servicios/especialidades',
-      'servicios/examenes',
-      'servicios/tratamientos',
-      'doctores/directorio',
-      'doctores/especialistas',
-      'doctores/horarios',
-      'doctores/calificaciones',
-      'pacientes/portal',
-      'pacientes/historial',
-      'pacientes/citas',
-      'pacientes/medicamentos',
+      "servicios/urgencias",
+      "servicios/especialidades",
+      "servicios/examenes",
+      "servicios/tratamientos",
+      "doctores/directorio",
+      "doctores/especialistas",
+      "doctores/horarios",
+      "doctores/calificaciones",
+      "pacientes/portal",
+      "pacientes/historial",
+      "pacientes/citas",
+      "pacientes/medicamentos",
     ];
-    
+
     // If path is protected and user is not logged in, redirect to login
+    if (path === "servicios/especialidades") {
+      scrollToEspecialidades(); // baja a la sección de especialidades
+      return;
+    }
+
     if (protectedPaths.includes(path) && !isLoggedIn) {
       navigate("login");
     } else {
@@ -232,14 +242,14 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
   // Helper function to get a nice display name from email
   const getUserDisplayName = () => {
     if (!userEmail) return "Usuario";
-    
+
     // If email contains @, get the part before @
-    if (userEmail.includes('@')) {
-      const name = userEmail.split('@')[0];
+    if (userEmail.includes("@")) {
+      const name = userEmail.split("@")[0];
       // Capitalize first letter
       return name.charAt(0).toUpperCase() + name.slice(1);
     }
-    
+
     return userEmail;
   };
 
@@ -247,12 +257,12 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
   const renderAuthSection = () => {
     if (isLoggedIn) {
       return (
-        <div 
+        <div
           className={windowWidth > 768 ? "userProfile" : "userProfile d-none"}
           ref={userMenuRef}
         >
-          <button 
-            className="userButton" 
+          <button
+            className="userButton"
             onClick={() => setUserMenuOpen(!userMenuOpen)}
           >
             <div className="userAvatar">
@@ -274,14 +284,17 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </button>
-          
+
           {userMenuOpen && (
             <div className="userMenu">
               <div className="userMenuHeader">
                 <span className="userMenuEmail">{userEmail}</span>
               </div>
               <div className="userMenuDivider"></div>
-              <button className="userMenuItem" onClick={() => handleNavigate('perfil')}>
+              <button
+                className="userMenuItem"
+                onClick={() => handleNavigate("perfil")}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -298,7 +311,10 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                 </svg>
                 Mi Perfil
               </button>
-              <button className="userMenuItem" onClick={() => handleNavigate('pacientes/citas')}>
+              <button
+                className="userMenuItem"
+                onClick={() => handleNavigate("pacientes/citas")}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -318,7 +334,10 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                 Mis Citas
               </button>
               <div className="userMenuDivider"></div>
-              <button className="userMenuItem logoutMenuItem" onClick={handleLogout}>
+              <button
+                className="userMenuItem logoutMenuItem"
+                onClick={handleLogout}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -342,15 +361,21 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
       );
     } else {
       return (
-        <div className={windowWidth > 768 ? "authButtons" : "authButtons d-none"}>
+        <div
+          className={windowWidth > 768 ? "authButtons" : "authButtons d-none"}
+        >
           <button className="signInButton" onClick={() => navigate("login")}>
             Iniciar Sesión
           </button>
           <button
             className="signUpButton"
             onClick={() => navigate("registro")}
-            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#0ea271")}
-            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#10b981")}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.backgroundColor = "#0ea271")
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.backgroundColor = "#10b981")
+            }
           >
             Registrarse
           </button>
@@ -431,10 +456,10 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
               </div>
             ))}
           </div>
-          
+
           {/* Replace with the new auth section */}
           {renderAuthSection()}
-          
+
           {/* Mobile Menu Button */}
           <button
             className={
@@ -505,7 +530,7 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                 )}
               </div>
             ))}
-            
+
             {/* Add user information for logged in users */}
             {isLoggedIn ? (
               <div className="mobileUserSection">
@@ -515,25 +540,34 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                   </div>
                   <span className="userMenuEmail">{userEmail}</span>
                 </div>
-                
-                <button className="mobileNavLink mobileMenuItem" onClick={() => {
-                  handleNavigate('perfil');
-                  setMenuOpen(false);
-                }}>
+
+                <button
+                  className="mobileNavLink mobileMenuItem"
+                  onClick={() => {
+                    handleNavigate("perfil");
+                    setMenuOpen(false);
+                  }}
+                >
                   Mi Perfil
                 </button>
-                
-                <button className="mobileNavLink mobileMenuItem" onClick={() => {
-                  handleNavigate('pacientes/citas');
-                  setMenuOpen(false);
-                }}>
+
+                <button
+                  className="mobileNavLink mobileMenuItem"
+                  onClick={() => {
+                    handleNavigate("pacientes/citas");
+                    setMenuOpen(false);
+                  }}
+                >
                   Mis Citas
                 </button>
-                
-                <button className="mobileNavLink logoutButton" onClick={() => {
-                  handleLogout();
-                  setMenuOpen(false);
-                }}>
+
+                <button
+                  className="mobileNavLink logoutButton"
+                  onClick={() => {
+                    handleLogout();
+                    setMenuOpen(false);
+                  }}
+                >
                   Cerrar Sesión
                 </button>
               </div>
@@ -568,11 +602,21 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
 
         {/* Añadir botón de acción principal */}
         <div className="heroCta">
-          <button 
+          <button
             className="ctaButton"
-            onClick={() => handleNavigate('servicios/urgencias')}
+            onClick={() => handleNavigate("servicios/urgencias")}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
               <line x1="16" y1="2" x2="16" y2="6"></line>
               <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -638,6 +682,63 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
         </div>
       </div>
 
+      <div ref={especialidadesRef} className="especialidadesSection">
+        <h2 className="sectionTitle"> Nuestras Especialidades</h2>
+        <p className="sectionDescription">
+          Contamos con un equipo de especialistas dedicados a brindarte la mejor
+          atención en cada área de la salud.
+        </p>
+        <div className="especialidadesGrid">
+          {[
+            {
+              nombre: "Cardiología",
+              description:
+                "Diagnóstico y tratamiento de enfermedades del corazón.",
+              imagen: "/imgs/especialities/cardiologia.jpg",
+            },
+            {
+              nombre: "Dermatología",
+              descripcion: "Cuidado de la piel, cabello y uñas.",
+              imagen: "/imgs/especialidades/dermatologia.jpg",
+            },
+            {
+              nombre: "Ginecología",
+              descripcion: "Salud integral de la mujer.",
+              imagen: "/imgs/especialidades/ginecologia.jpg",
+            },
+            {
+              nombre: "Pediatría",
+              descripcion: "Cuidado de la salud infantil.",
+              imagen: "/imgs/especialidades/pediatria.jpg",
+            },
+            {
+              nombre: "Neurología",
+              descripcion: "Sistema nervioso y trastornos neurológicos.",
+              imagen: "/imgs/especialidades/neurologia.jpg",
+            },
+            {
+              nombre: "Odontología",
+              descripcion: "Salud bucal y tratamientos dentales.",
+              imagen: "/imgs/especialidades/odontologia.jpg",
+            },
+            {
+              nombre: "Oftalmología",
+              descripcion: "Salud visual y tratamientos de la vista.",
+              imagen: "/imgs/especialidades/oftalmologia.jpg",
+            },
+          ].map((esp, idx) => (
+            <div key={idx} className="especialidadCard">
+              <img
+                src={esp.imagen}
+                alt={esp.nombre}
+                className="especialidadImage"
+              />
+              <h3 className="especialidadTitle">{esp.nombre}</h3>
+              <p className="especialidadDescription">{esp.descripcion}</p>
+            </div>
+          ))}
+        </div>
+      </div>
       {/* Footer */}
       <footer className="footer">
         <div

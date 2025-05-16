@@ -299,7 +299,7 @@
 }
 
 .ctaButton {
-  background: linear-gradient(135deg, #10B981, #059669);
+  background: linear-gradient(135deg, #10b981, #059669);
   color: white;
   border: none;
   border-radius: 0.75rem;
@@ -311,12 +311,12 @@
   gap: 0.75rem;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 6px 20px rgba(16,185,129,0.2);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);
 }
 
 .ctaButton:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(16,185,129,0.3);
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
 }
 
 .ctaButton:active {
@@ -471,7 +471,7 @@
 .userAvatar {
   width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, #10B981, #059669);
+  background: linear-gradient(135deg, #10b981, #059669);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -495,7 +495,7 @@
   width: 240px;
   background: white;
   border-radius: 0.75rem;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   animation: fadeInDown 0.2s ease;
   z-index: 1001;
@@ -509,7 +509,7 @@
 
 .userMenuEmail {
   font-size: 0.85rem;
-  color: #6B7280;
+  color: #6b7280;
   word-break: break-all;
 }
 
@@ -536,16 +536,79 @@
 
 .userMenuItem:hover {
   background-color: #f3f4f6;
-  color: #10B981;
+  color: #10b981;
 }
 
 .logoutMenuItem {
-  color: #EF4444;
+  color: #ef4444;
 }
 
 .logoutMenuItem:hover {
-  background-color: #FEF2F2;
-  color: #DC2626;
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.especialidadesSection {
+  background-color: #f9fafb;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.especialidadesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.especialidadCard {
+  background-color: white;
+  border-radius: 12px;
+  width: 250px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.especialidadCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.especialidadImg {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.especialidadNombre {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  color: #111827;
+}
+
+.especialidadDescripcion {
+  font-size: 0.95rem;
+  color: #4b5563;
+  padding: 0 1rem 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.sectionSubtitle {
+  font-size: 1.125rem;
+  color: #6b7280;
+  max-width: 700px;
+  margin: 0 auto 2rem;
 }
 
 @keyframes fadeInDown {
@@ -605,7 +668,7 @@
   .mobileMenuButton {
     display: block;
   }
-  
+
   .ctaButton {
     width: 100%;
     justify-content: center;
