@@ -692,39 +692,39 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
           {[
             {
               nombre: "Cardiología",
-              description:
+              descripcion:
                 "Diagnóstico y tratamiento de enfermedades del corazón.",
-              imagen: "/imgs/especialities/cardiologia.jpg",
+              imagen: "/imgs/specialties/cardiologia.jpg",
             },
             {
               nombre: "Dermatología",
               descripcion: "Cuidado de la piel, cabello y uñas.",
-              imagen: "/imgs/especialidades/dermatologia.jpg",
+              imagen: "/imgs/specialties/dermatologia.jpg",
             },
             {
               nombre: "Ginecología",
               descripcion: "Salud integral de la mujer.",
-              imagen: "/imgs/especialidades/ginecologia.jpg",
+              imagen: "/imgs/specialties/ginecologia.jpg",
             },
             {
               nombre: "Pediatría",
               descripcion: "Cuidado de la salud infantil.",
-              imagen: "/imgs/especialidades/pediatria.jpg",
+              imagen: "/imgs/specialties/pediatria.jpg",
             },
             {
               nombre: "Neurología",
               descripcion: "Sistema nervioso y trastornos neurológicos.",
-              imagen: "/imgs/especialidades/neurologia.jpg",
+              imagen: "/imgs/specialties/neurologia.jpg",
             },
             {
               nombre: "Odontología",
               descripcion: "Salud bucal y tratamientos dentales.",
-              imagen: "/imgs/especialidades/odontologia.jpg",
+              imagen: "/imgs/specialties/odontologia.jpg",
             },
             {
               nombre: "Oftalmología",
               descripcion: "Salud visual y tratamientos de la vista.",
-              imagen: "/imgs/especialidades/oftalmologia.jpg",
+              imagen: "/imgs/specialties/oftalmologia.jpg",
             },
           ].map((esp, idx) => (
             <div key={idx} className="especialidadCard">

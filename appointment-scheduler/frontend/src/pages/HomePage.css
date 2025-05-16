@@ -555,46 +555,57 @@
 }
 
 .especialidadesGrid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 2rem;
   margin-top: 2rem;
+  justify-items: center;
 }
 
 .especialidadCard {
   background-color: white;
-  border-radius: 12px;
-  width: 250px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 280px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
 }
 
 .especialidadCard:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
 }
 
 .especialidadImg {
   width: 100%;
-  height: 160px;
-  object-fit: cover;
+  height: 180px;
+  object-fit: contain;
+  padding: 20px;
+  background-color: #f9fafb;
   border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Código refactorizado */
 .especialidadNombre {
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  margin-top: 1rem;
+  margin: 1.25rem 0 0.5rem;
   color: #111827;
+  padding: 0 1.25rem;
 }
 
 .especialidadDescripcion {
   font-size: 0.95rem;
   color: #4b5563;
-  padding: 0 1rem 1.5rem;
+  padding: 0 1.25rem 1.5rem;
+  line-height: 1.5;
 }
 
 .sectionTitle {
@@ -609,6 +620,28 @@
   color: #6b7280;
   max-width: 700px;
   margin: 0 auto 2rem;
+}
+
+/* Añadir este código */
+.especialidadCard {
+  /* Propiedades existentes */
+  min-height: 300px;
+}
+
+.especialidadImg {
+  /* Propiedades existentes */
+  background-color: #f9fafb;
+}
+
+@media (max-width: 640px) {
+  .especialidadCard {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .especialidadImg {
+    max-height: 180px;
+  }
 }
 
 @keyframes fadeInDown {
