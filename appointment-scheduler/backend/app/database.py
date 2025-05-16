@@ -6,9 +6,9 @@ from typing import Generator
 
 # Credenciales de base de datos directamente en el código
 DB_USER = "root"
-DB_PASSWORD = "password"
+DB_PASSWORD = "sebastianolivo"
 DB_HOST = "localhost"
-DB_PORT = "3307"
+DB_PORT = "3306"
 DB_NAME = "healpoint"
 
 # Configuración de la conexión

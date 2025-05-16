@@ -1,42 +1,42 @@
-import React, { useState } from 'react';
-import axios from 'axios'; // Asegúrate de tener axios instalado: npm install axios
-import medicoImage from '../imgs/medicos.jpg';
-import './AuthPages.css';
+import React, { useState } from "react";
+import axios from "axios"; // Asegúrate de tener axios instalado: npm install axios
+import medicoImage from "../imgs/medicos.jpg";
+import "./AuthPages.css";
 
-const API_URL = "http://localhost:8085"; // Ajusta esto a la URL de tu API
+const API_URL = "http://localhost:8000"; // Ajusta esto a la URL de tu API
 
 const RegisterPage = ({ navigate }) => {
   const [formData, setFormData] = useState({
-    nombre: '',
-    email: '',
-    cedula: '',
-    password: '',
-    confirmPassword: '',
-    genero: '',  // Añadido para el backend
-    telefono: '', // Añadido para el backend
-    fecha_nacimiento: '', // Añadido para el backend
-    aceptaTerminos: false
+    nombre: "",
+    email: "",
+    cedula: "",
+    password: "",
+    confirmPassword: "",
+    genero: "", // Añadido para el backend
+    telefono: "", // Añadido para el backend
+    fecha_nacimiento: "", // Añadido para el backend
+    aceptaTerminos: false,
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const isMounted = React.useRef(true);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden');
+      setError("Las contraseñas no coinciden");
       setLoading(false);
       return;
     }
@@ -49,41 +49,42 @@ const RegisterPage = ({ navigate }) => {
         contraseña: formData.password, // Nota: contraseña en backend, password en frontend
         telefono: formData.telefono || formData.cedula, // Usar cédula como teléfono si no se proporciona
         genero: formData.genero || "no especificado", // Valor por defecto
-        fecha_nacimiento: formData.fecha_nacimiento || null // Opcional
+        fecha_nacimiento: formData.fecha_nacimiento || null, // Opcional
       };
 
-      console.log('Enviando datos al servidor:', pacienteData);
-      
+      console.log("Enviando datos al servidor:", pacienteData);
+
       // Llamada a la API
       const response = await axios.post(`${API_URL}/pacientes/`, pacienteData);
-      
-      console.log('Registro exitoso:', response.data);
-      
+
+      console.log("Registro exitoso:", response.data);
+
       // Redirigir o mostrar mensaje de éxito
-      navigate('registro-exitoso');
+      navigate("registro-exitoso");
     } catch (error) {
-      console.error('Error en el registro:', error);
-      
+      console.error("Error en el registro:", error);
+
       if (isMounted.current) {
-        if(error.response && error.response.data) {
-          setError(error.response.data.detail || 'Error al registrar. Por favor, intenta de nuevo.');
+        if (error.response && error.response.data) {
+          setError(
+            error.response.data.detail ||
+              "Error al registrar. Por favor, intenta de nuevo."
+          );
         } else {
-          setError('No se pudo completar el registro. Por favor, intenta de nuevo.');
+          setError(
+            "No se pudo completar el registro. Por favor, intenta de nuevo."
+          );
         }
-
       }
-
-    
-    
     } finally {
-      if(isMounted.current) {
-      setLoading(false);
-    }
+      if (isMounted.current) {
+        setLoading(false);
+      }
     }
   };
 
   const handleReturnHome = () => {
-    navigate('home');
+    navigate("home");
   };
 
   return (
@@ -104,7 +105,8 @@ const RegisterPage = ({ navigate }) => {
           </div>
           <h1 className="authTitle">Crea tu cuenta</h1>
           <p className="authSubtitle">
-            Únete a HealPoint y comienza a gestionar tus citas y pacientes de forma eficiente
+            Únete a HealPoint y comienza a gestionar tus citas y pacientes de
+            forma eficiente
           </p>
         </div>
 
@@ -116,7 +118,9 @@ const RegisterPage = ({ navigate }) => {
 
         <form onSubmit={handleSubmit} className="authForm">
           <div className="formGroup">
-            <label htmlFor="nombre" className="formLabel">Nombre completo</label>
+            <label htmlFor="nombre" className="formLabel">
+              Nombre completo
+            </label>
             <input
               type="text"
               id="nombre"
@@ -130,7 +134,9 @@ const RegisterPage = ({ navigate }) => {
             />
           </div>
           <div className="formGroup">
-            <label htmlFor="cedula" className="formLabel">Cédula</label>
+            <label htmlFor="cedula" className="formLabel">
+              Cédula
+            </label>
             <input
               type="text"
               id="cedula"
@@ -144,7 +150,9 @@ const RegisterPage = ({ navigate }) => {
           </div>
 
           <div className="formGroup">
-            <label htmlFor="telefono" className="formLabel">Teléfono (opcional)</label>
+            <label htmlFor="telefono" className="formLabel">
+              Teléfono (opcional)
+            </label>
             <input
               type="tel"
               id="telefono"
@@ -157,7 +165,9 @@ const RegisterPage = ({ navigate }) => {
           </div>
 
           <div className="formGroup">
-            <label htmlFor="email" className="formLabel">Correo electrónico</label>
+            <label htmlFor="email" className="formLabel">
+              Correo electrónico
+            </label>
             <input
               type="email"
               id="email"
@@ -172,7 +182,9 @@ const RegisterPage = ({ navigate }) => {
           </div>
 
           <div className="formGroup">
-            <label htmlFor="password" className="formLabel">Contraseña</label>
+            <label htmlFor="password" className="formLabel">
+              Contraseña
+            </label>
             <input
               type="password"
               id="password"
@@ -188,7 +200,9 @@ const RegisterPage = ({ navigate }) => {
           </div>
 
           <div className="formGroup">
-            <label htmlFor="confirmPassword" className="formLabel">Confirmar contraseña</label>
+            <label htmlFor="confirmPassword" className="formLabel">
+              Confirmar contraseña
+            </label>
             <input
               type="password"
               id="confirmPassword"
@@ -203,7 +217,9 @@ const RegisterPage = ({ navigate }) => {
           </div>
 
           <div className="formGroup">
-            <label htmlFor="fecha_nacimiento" className="formLabel">Fecha de nacimiento (opcional)</label>
+            <label htmlFor="fecha_nacimiento" className="formLabel">
+              Fecha de nacimiento (opcional)
+            </label>
             <input
               type="date"
               id="fecha_nacimiento"
@@ -215,7 +231,9 @@ const RegisterPage = ({ navigate }) => {
           </div>
 
           <div className="formGroup">
-            <label htmlFor="genero" className="formLabel">Género (opcional)</label>
+            <label htmlFor="genero" className="formLabel">
+              Género (opcional)
+            </label>
             <select
               id="genero"
               name="genero"
@@ -241,7 +259,17 @@ const RegisterPage = ({ navigate }) => {
               required
             />
             <label htmlFor="aceptaTerminos">
-              Acepto los <span className="termsLink" onClick={() => navigate('terminos')}>Términos de servicio</span> y la <span className="termsLink" onClick={() => navigate('privacidad')}>Política de privacidad</span>
+              Acepto los{" "}
+              <span className="termsLink" onClick={() => navigate("terminos")}>
+                Términos de servicio
+              </span>{" "}
+              y la{" "}
+              <span
+                className="termsLink"
+                onClick={() => navigate("privacidad")}
+              >
+                Política de privacidad
+              </span>
             </label>
           </div>
 
@@ -250,13 +278,13 @@ const RegisterPage = ({ navigate }) => {
             className="authButton"
             disabled={loading || !formData.aceptaTerminos}
           >
-            {loading ? 'Creando cuenta...' : 'Crear cuenta'}
+            {loading ? "Creando cuenta..." : "Crear cuenta"}
           </button>
         </form>
 
         <div className="authPrompt">
           <span>¿Ya tienes una cuenta?</span>
-          <span className="authLink" onClick={() => navigate('login')}>
+          <span className="authLink" onClick={() => navigate("login")}>
             Iniciar sesión
           </span>
         </div>
