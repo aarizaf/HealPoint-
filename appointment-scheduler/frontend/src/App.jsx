@@ -3,6 +3,7 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import MedicalAppointment from "./pages/MedicalAppointment";
+import ContactPage from "./pages/ContactPage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -38,6 +39,14 @@ function App() {
         return <LoginPage navigate={navigate} setIsLoggedIn={setIsLoggedIn} />;
       case "registro":
         return <RegisterPage navigate={navigate} />;
+      case "contacto":
+        return (
+          <ContactPage
+            navigate={navigate}
+            isLoggedIn={isLoggedIn}
+            setIsLoggedIn={setIsLoggedIn}
+          />
+        );
       case "servicios/urgencias":
         return (
           <MedicalAppointment

@@ -1,0 +1,342 @@
+/* Código refactorizado */
+.contactContainer {
+  padding: 5rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Elementos decorativos para añadir modernidad */
+.contactContainer::before {
+  content: "";
+  position: absolute;
+  top: -150px;
+  right: -150px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.05);
+  z-index: -1;
+}
+
+.contactContainer::after {
+  content: "";
+  position: absolute;
+  bottom: -100px;
+  left: -100px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.05);
+  z-index: -1;
+}
+
+/* Código refactorizado */
+.contactHeader {
+  text-align: center;
+  margin-bottom: 4rem;
+  position: relative;
+}
+
+.contactHeader h1 {
+  font-size: 2.5rem;
+  color: #111827;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.contactHeader h1::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #10b981, #059669);
+  margin: 1rem auto 0;
+  border-radius: 2px;
+}
+
+.contactHeader p {
+  font-size: 1.15rem;
+  color: #6b7280;
+  max-width: 650px;
+  margin: 1.5rem auto 0;
+  line-height: 1.7;
+}
+
+/* Código refactorizado */
+.contactGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 3rem;
+  align-items: stretch;
+  position: relative;
+}
+
+@media (max-width: 940px) {
+  .contactGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contactInfo {
+  background-color: #f8fafc;
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.contactInfo h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  color: #111827;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.contactInfo h2::before {
+  content: "";
+  display: block;
+  width: 12px;
+  height: 12px;
+  background: #10b981;
+  border-radius: 50%;
+}
+
+.contactInfoItem {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.contactInfoIcon {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.contactInfoContent {
+  flex-grow: 1;
+}
+
+.contactInfoTitle {
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.contactInfoText {
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.socialLinks {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.socialLink {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5563;
+  transition: all 0.2s ease;
+}
+
+.socialLink:hover {
+  background-color: #10b981;
+  border-color: #10b981;
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+}
+
+.contactForm {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 10;
+}
+
+.contactForm h2 {
+  margin-bottom: 2rem;
+  font-size: 1.4rem;
+  color: #111827;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+}
+
+.contactForm h2::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: #10b981;
+  margin-top: 0.5rem;
+  border-radius: 2px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.formField {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.formField.full {
+  grid-column: 1 / -1;
+}
+
+.formField label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+}
+
+.formField input,
+.formField textarea {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 1rem;
+  background-color: #f9fafb;
+  transition: all 0.2s ease;
+}
+
+.formField input:focus,
+.formField textarea:focus {
+  outline: none;
+  border-color: #10b981;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.formField textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  color: #4b5563;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.checkbox input {
+  margin-top: 0.25rem;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.checkbox input:checked {
+  background-color: #10b981;
+  border-color: #10b981;
+}
+
+.checkbox input:checked::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.contactForm button {
+  padding: 1rem 1.5rem;
+  background: linear-gradient(90deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.contactForm button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(16, 185, 129, 0.25);
+}
+
+.contactForm button:active {
+  transform: translateY(0);
+}
+
+.submitIcon {
+  transition: transform 0.2s ease;
+}
+
+.contactForm button:hover .submitIcon {
+  transform: translateX(3px);
+}
+
+@media (max-width: 640px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .contactForm {
+    padding: 2rem 1.5rem;
+  }
+
+  .contactInfo {
+    padding: 2rem 1.5rem;
+  }
+}
