@@ -17,7 +17,7 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
   };
 
   useEffect(() => {
-    // Get user email from localStorage if logged in
+    // Get email from localStorage if logged in
     if (isLoggedIn) {
       const email = localStorage.getItem("userEmail") || "Usuario";
       setUserEmail(email);
@@ -56,7 +56,7 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
     navigate("home");
   };
 
-  // Icons as components
+  // Icon components
   const CalendarIcon = () => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -147,7 +147,7 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
     </svg>
   );
 
-  // Updated with options relevant for appointment management platform
+  // Navigation with options relevant for appointment management platform
   const navOptions = [
     { name: "Inicio", path: "home" },
     {
@@ -155,7 +155,7 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
       path: "servicios",
       dropdown: true,
       items: [
-        { name: "Asignar cita médica", path: "servicios/urgencias" },
+        { name: "Asignar cita médica", path: "cita-medica" },
         { name: "Especialidades", path: "servicios/especialidades" },
         { name: "Exámenes", path: "servicios/examenes" },
         { name: "Tratamientos", path: "servicios/tratamientos" },
@@ -179,7 +179,7 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
       items: [
         { name: "Portal del Paciente", path: "pacientes/portal" },
         { name: "Historial Médico", path: "pacientes/historial" },
-        { name: "Próximas Citas", path: "pacientes/citas" },
+        { name: "Mis Citas", path: "mis-citas" },
         { name: "Medicamentos", path: "pacientes/medicamentos" },
       ],
     },
@@ -210,10 +210,10 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
 
   // Check if user is logged in before navigating to protected routes
   const handleNavigate = (path) => {
-    // List of paths that require authentication
+    // Protected paths that require authentication
     const protectedPaths = [
-      "servicios/urgencias",
-      "servicios/especialidades",
+      "cita-medica",
+      "mis-citas",
       "servicios/examenes",
       "servicios/tratamientos",
       "doctores/directorio",
@@ -222,13 +222,12 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
       "doctores/calificaciones",
       "pacientes/portal",
       "pacientes/historial",
-      "pacientes/citas",
       "pacientes/medicamentos",
     ];
 
-    // If path is protected and user is not logged in, redirect to login
+    // If protected and user is not logged in, redirect to login
     if (path === "servicios/especialidades") {
-      scrollToEspecialidades(); // baja a la sección de especialidades
+      scrollToEspecialidades();  // Scroll to especialidades section
       return;
     }
 
@@ -313,7 +312,7 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
               </button>
               <button
                 className="userMenuItem"
-                onClick={() => handleNavigate("pacientes/citas")}
+                onClick={() => handleNavigate("mis-citas")}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -554,7 +553,7 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                 <button
                   className="mobileNavLink mobileMenuItem"
                   onClick={() => {
-                    handleNavigate("pacientes/citas");
+                    handleNavigate("mis-citas");
                     setMenuOpen(false);
                   }}
                 >
@@ -604,7 +603,7 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
         <div className="heroCta">
           <button
             className="ctaButton"
-            onClick={() => handleNavigate("servicios/urgencias")}
+            onClick={() => handleNavigate("cita-medica")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -13,7 +13,9 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
   const [patientID, setPatientID] = useState("");
   const [symptoms, setSymptoms] = useState("");
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [timeSlotsVisible, setTimeSlotsVisible] = useState(false);
+  const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
 
   // Tipos de citas disponibles
   const appointmentTypes = [
@@ -33,49 +35,65 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
       if (userEmail) {
         setPatientEmail(userEmail);
       }
+
+      // Establecer la fecha mínima como hoy
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("appointmentDate").min = today;
     }
   }, [isLoggedIn, navigate]);
 
   // Generar horarios disponibles cuando la fecha cambia
-  useEffect(() => {
-    if (selectedDate) {
-      // Aquí se conectaría con tu backend para obtener horarios disponibles
-      // Por ahora, generamos datos de ejemplo
-      generateAvailableTimes(selectedDate);
+  const handleDateChange = (e) => {
+    setSelectedDate(e.target.value);
+    
+    if (e.target.value) {
+      setTimeSlotsVisible(true);
+      setLoadingTimeSlots(true);
+      
+      // Simulación de carga de horarios disponibles
+      setTimeout(() => {
+        generateAvailableTimes(e.target.value);
+        setLoadingTimeSlots(false);
+      }, 800);
+    } else {
+      setTimeSlotsVisible(false);
     }
-  }, [selectedDate, selectedType]);
+  };
 
   // Generar horarios disponibles (simulación)
   const generateAvailableTimes = (date) => {
-    setLoading(true);
+    const times = [];
+    // Horarios de 8:00 AM a 5:00 PM con intervalos de 30 minutos
+    const startHour = 8;
+    const endHour = 17;
 
-    // Simulamos una llamada a la API con un timeout
-    setTimeout(() => {
-      const times = [];
-      // Horario de 8:00 AM a 5:00 PM con intervalos de 30 minutos
-      const startHour = 8;
-      const endHour = 17;
+    // Disponibilidad cambia según el día de la semana
+    const dateObj = new Date(date);
+    const dayOfWeek = dateObj.getDay(); // 0 = domingo, 1 = lunes, etc.
 
-      // La disponibilidad cambia según el día de la semana
-      const dateObj = new Date(date);
-      const dayOfWeek = dateObj.getDay(); // 0 = domingo, 1 = lunes, etc.
+    // Menos horarios disponibles en fin de semana
+    const totalSlots = dayOfWeek === 0 || dayOfWeek === 6 ? 5 : 12;
 
-      // Menos horarios disponibles en fin de semana
-      const totalSlots = dayOfWeek === 0 || dayOfWeek === 6 ? 5 : 12;
+    for (let i = 0; i < totalSlots; i++) {
+      const hour =
+        startHour + Math.floor(Math.random() * (endHour - startHour));
+      const minute = Math.random() > 0.5 ? "00" : "30";
+      times.push(`${hour}:${minute}`);
+    }
 
-      for (let i = 0; i < totalSlots; i++) {
-        const hour =
-          startHour + Math.floor(Math.random() * (endHour - startHour));
-        const minute = Math.random() > 0.5 ? "00" : "30";
-        times.push(`${hour}:${minute}`);
-      }
+    // Ordenar horarios
+    times.sort();
+    setAvailableTimes([...new Set(times)]); // Eliminar duplicados
+  };
 
-      // Ordenar horarios
-      times.sort();
+  // Seleccionar tipo de cita
+  const handleTypeSelection = (typeId) => {
+    setSelectedType(typeId);
+  };
 
-      setAvailableTimes([...new Set(times)]); // Eliminar duplicados
-      setLoading(false);
-    }, 600);
+  // Seleccionar horario
+  const handleTimeSelection = (time) => {
+    setSelectedTime(time);
   };
 
   // Manejar envío del formulario
@@ -83,30 +101,42 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
     e.preventDefault();
     setLoading(true);
 
-    // Datos de la cita
+    // Preparar la cita
     const appointmentData = {
+      id: Date.now().toString(), // ID único para la cita
       patientName,
       patientID,
       patientEmail,
       patientPhone,
       date: selectedDate,
       time: selectedTime,
-      type: appointmentTypes.find((type) => type.id === selectedType),
+      typeId: selectedType,
+      typeName: appointmentTypes.find((type) => type.id === selectedType).name,
+      duration: appointmentTypes.find((type) => type.id === selectedType).duration,
       symptoms,
+      status: "confirmada", // Estado inicial: confirmada
+      createdAt: new Date().toISOString(), // Fecha de creación
     };
 
     console.log("Datos de la cita:", appointmentData);
 
-    // Simulamos envío a un servidor
+    // Guardar cita en localStorage
+    const userEmail = localStorage.getItem("userEmail");
+    const savedCitations = JSON.parse(localStorage.getItem(`citations_${userEmail}`) || "[]");
+    savedCitations.push(appointmentData);
+    localStorage.setItem(`citations_${userEmail}`, JSON.stringify(savedCitations));
+
+    // Simular envío a un servidor
     setTimeout(() => {
       setLoading(false);
-      setSuccess(true);
-
-      // Reset form after success
-      setTimeout(() => {
-        navigate("home");
-      }, 3000);
+      setShowSuccess(true);
     }, 1500);
+  };
+
+  // Cerrar modal de éxito
+  const closeSuccessModal = () => {
+    setShowSuccess(false);
+    navigate("home");
   };
 
   // Formatear fecha para mostrar en formato amigable
@@ -121,46 +151,19 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
     return new Date(dateString).toLocaleDateString("es-ES", options);
   };
 
-  if (success) {
+  // Verificar si el formulario está completo
+  const isFormComplete = () => {
     return (
-      <>
-        <Navbar
-          isLoggedIn={isLoggedIn}
-          setIsLoggedIn={setIsLoggedIn}
-          navigate={navigate}
-        />
-        <div className="appointmentContainer">
-          <div className="appointmentCard">
-            <div className="successIcon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="64"
-                height="64"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-              </svg>
-            </div>
-            <h2 className="successTitle">¡Cita Agendada Exitosamente!</h2>
-            <p className="successText">
-              Su cita ha sido programada para el {formatDate(selectedDate)} a
-              las {selectedTime}. Recibirá un correo de confirmación con los
-              detalles en breve.
-            </p>
-            <button className="returnButton" onClick={() => navigate("home")}>
-              Volver al Inicio
-            </button>
-          </div>
-        </div>
-      </>
+      patientName && 
+      patientID && 
+      patientEmail && 
+      patientPhone && 
+      selectedType && 
+      selectedDate && 
+      selectedTime && 
+      symptoms
     );
-  }
+  };
 
   return (
     <>
@@ -169,8 +172,10 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
         setIsLoggedIn={setIsLoggedIn}
         navigate={navigate}
       />
+      
       <div className="appointmentContainer">
         <div className="appointmentCard">
+          {/* Header */}
           <div className="appointmentHeader">
             <div className="logoContainer">
               <div className="logoBox">H</div>
@@ -182,74 +187,77 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
             </p>
           </div>
 
+          {/* Form */}
           <form onSubmit={handleSubmit} className="appointmentForm">
+            {/* Sección 1: Información Personal */}
             <div className="appointmentSection">
               <h2 className="sectionTitle">1. Información Personal</h2>
+              <div className="formGrid">
+                <div className="formGroup">
+                  <label htmlFor="patientName" className="formLabel">
+                    Nombre completo
+                  </label>
+                  <input
+                    type="text"
+                    id="patientName"
+                    className="formInput"
+                    placeholder="Ingrese su nombre completo"
+                    value={patientName}
+                    onChange={(e) => setPatientName(e.target.value)}
+                    required
+                  />
+                </div>
 
-              <div className="formGroup">
-                <label htmlFor="patientName" className="formLabel">
-                  Nombre completo
-                </label>
-                <input
-                  type="text"
-                  id="patientName"
-                  className="formInput"
-                  placeholder="Ingrese su nombre completo"
-                  value={patientName}
-                  onChange={(e) => setPatientName(e.target.value)}
-                  required
-                />
-              </div>
+                <div className="formGroup">
+                  <label htmlFor="patientID" className="formLabel">
+                    Documento de Identidad
+                  </label>
+                  <input
+                    type="text"
+                    id="patientID"
+                    className="formInput"
+                    placeholder="Ingrese su número de documento"
+                    value={patientID}
+                    onChange={(e) => setPatientID(e.target.value)}
+                    required
+                  />
+                </div>
 
-              <div className="formGroup">
-                <label htmlFor="patientID" className="formLabel">
-                  Documento de Identidad
-                </label>
-                <input
-                  type="text"
-                  id="patientID"
-                  className="formInput"
-                  placeholder="Ingrese su número de documento"
-                  value={patientID}
-                  onChange={(e) => setPatientID(e.target.value)}
-                  required
-                />
-              </div>
+                <div className="formGroup">
+                  <label htmlFor="patientEmail" className="formLabel">
+                    Correo electrónico
+                  </label>
+                  <input
+                    type="email"
+                    id="patientEmail"
+                    className="formInput"
+                    placeholder="correo@ejemplo.com"
+                    value={patientEmail}
+                    onChange={(e) => setPatientEmail(e.target.value)}
+                    required
+                  />
+                </div>
 
-              <div className="formGroup">
-                <label htmlFor="patientEmail" className="formLabel">
-                  Correo electrónico
-                </label>
-                <input
-                  type="email"
-                  id="patientEmail"
-                  className="formInput"
-                  placeholder="correo@ejemplo.com"
-                  value={patientEmail}
-                  onChange={(e) => setPatientEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="formGroup">
-                <label htmlFor="patientPhone" className="formLabel">
-                  Teléfono
-                </label>
-                <input
-                  type="tel"
-                  id="patientPhone"
-                  className="formInput"
-                  placeholder="(123) 456-7890"
-                  value={patientPhone}
-                  onChange={(e) => setPatientPhone(e.target.value)}
-                  required
-                />
+                <div className="formGroup">
+                  <label htmlFor="patientPhone" className="formLabel">
+                    Teléfono
+                  </label>
+                  <input
+                    type="tel"
+                    id="patientPhone"
+                    className="formInput"
+                    placeholder="(123) 456-7890"
+                    value={patientPhone}
+                    onChange={(e) => setPatientPhone(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
             </div>
 
+            {/* Sección 2: Tipo de Consulta */}
             <div className="appointmentSection">
               <h2 className="sectionTitle">2. Tipo de Consulta</h2>
-
               <div className="appointmentTypeGrid">
                 {appointmentTypes.map((type) => (
                   <div
@@ -257,7 +265,7 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                     className={`appointmentTypeCard ${
                       selectedType === type.id ? "selected" : ""
                     }`}
-                    onClick={() => setSelectedType(type.id)}
+                    onClick={() => handleTypeSelection(type.id)}
                   >
                     <div className="typeIcon">
                       {type.id === "general" && (
@@ -332,59 +340,64 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
               </div>
             </div>
 
+            {/* Sección 3: Fecha y Hora */}
             <div className="appointmentSection">
               <h2 className="sectionTitle">3. Fecha y Hora</h2>
-
-              <div className="formGroup">
-                <label htmlFor="appointmentDate" className="formLabel">
-                  Seleccione una fecha
-                </label>
-                <input
-                  type="date"
-                  id="appointmentDate"
-                  className="formInput dateInput"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  min={new Date().toISOString().split("T")[0]}
-                  required
-                />
-              </div>
-
-              {selectedDate && (
+              <div className="dateSelectorContainer">
                 <div className="formGroup">
-                  <label className="formLabel">Horarios disponibles</label>
-                  {loading ? (
-                    <div className="loadingTimeslots">
-                      <div className="loadingSpinner"></div>
-                      <span>Cargando horarios disponibles...</span>
-                    </div>
-                  ) : (
-                    <div className="timeSlotGrid">
-                      {availableTimes.length > 0 ? (
-                        availableTimes.map((time, index) => (
-                          <button
-                            key={index}
-                            type="button"
-                            className={`timeSlot ${
-                              selectedTime === time ? "selected" : ""
-                            }`}
-                            onClick={() => setSelectedTime(time)}
-                          >
-                            {time}
-                          </button>
-                        ))
-                      ) : (
-                        <p className="noTimesMessage">
-                          No hay horarios disponibles para la fecha
-                          seleccionada.
-                        </p>
-                      )}
-                    </div>
-                  )}
+                  <label htmlFor="appointmentDate" className="formLabel">
+                    Seleccione una fecha
+                  </label>
+                  <input
+                    type="date"
+                    id="appointmentDate"
+                    className="formInput dateInput"
+                    value={selectedDate}
+                    onChange={handleDateChange}
+                    min=""
+                    required
+                  />
                 </div>
-              )}
+
+                {timeSlotsVisible && (
+                  <div className="timeSlotsContainer">
+                    <label className="formLabel">Horarios disponibles</label>
+                    
+                    {loadingTimeSlots ? (
+                      <div className="loadingTimeslots">
+                        <div className="loadingSpinner"></div>
+                        <span>Cargando horarios disponibles...</span>
+                      </div>
+                    ) : (
+                      <>
+                        {availableTimes.length > 0 ? (
+                          <div className="timeSlotGrid">
+                            {availableTimes.map((time, index) => (
+                              <button
+                                key={index}
+                                type="button"
+                                className={`timeSlot ${
+                                  selectedTime === time ? "selected" : ""
+                                }`}
+                                onClick={() => handleTimeSelection(time)}
+                              >
+                                {time}
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="noTimesMessage">
+                            No hay horarios disponibles para la fecha seleccionada.
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
+            {/* Sección 4: Síntomas */}
             <div className="appointmentSection">
               <h2 className="sectionTitle">4. Motivo de la Consulta</h2>
               <div className="formGroup">
@@ -403,6 +416,7 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
               </div>
             </div>
 
+            {/* Botones de acción */}
             <div className="appointmentActions">
               <button
                 type="button"
@@ -414,22 +428,11 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
               <button
                 type="submit"
                 className="submitButton"
-                disabled={
-                  !selectedDate || !selectedTime || !selectedType || loading
-                }
+                disabled={!isFormComplete() || loading}
               >
                 {loading ? (
                   <div className="buttonLoading">
-                    <svg className="spinner" viewBox="0 0 24 24">
-                      <circle
-                        className="spinnerPath"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        fill="none"
-                        strokeWidth="3"
-                      ></circle>
-                    </svg>
+                    <div className="loadingSpinner"></div>
                     <span>Procesando...</span>
                   </div>
                 ) : (
@@ -440,6 +443,38 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
           </form>
         </div>
       </div>
+
+      {/* Modal de éxito */}
+      {showSuccess && (
+        <div className="successModal">
+          <div className="successModalContent">
+            <div className="successIcon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            <h2 className="successTitle">¡Cita Agendada Exitosamente!</h2>
+            <p className="successText">
+              Su cita ha sido programada para el {formatDate(selectedDate)} a las {selectedTime}. 
+              Recibirá un correo de confirmación con los detalles en breve.
+            </p>
+            <button className="returnButton" onClick={closeSuccessModal}>
+              Volver al Inicio
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

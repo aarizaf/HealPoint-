@@ -4,6 +4,9 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import MedicalAppointment from "./pages/MedicalAppointment";
 import ContactPage from "./pages/ContactPage";
+import MyCitations from "./pages/Mycitations";
+import MiPerfil from "./pages/Miperfil";
+import DirectorioMedico from "./pages/DirectorioMedico"; // Verificar que esta ruta sea correcta
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -19,6 +22,7 @@ function App() {
 
   // Navigation function
   const navigate = (route) => {
+    console.log("Navigating to:", route); // Añade este log para depurar
     setCurrentRoute(route);
     // Scroll to top when navigating
     window.scrollTo(0, 0);
@@ -26,6 +30,8 @@ function App() {
 
   // Render the appropriate component based on the current route
   const renderRoute = () => {
+    console.log("Current route:", currentRoute); // Añade este log para depurar
+    
     switch (currentRoute) {
       case "home":
         return (
@@ -47,9 +53,34 @@ function App() {
             setIsLoggedIn={setIsLoggedIn}
           />
         );
-      case "servicios/urgencias":
+      case "cita-medica":
         return (
           <MedicalAppointment
+            navigate={navigate}
+            isLoggedIn={isLoggedIn}
+            setIsLoggedIn={setIsLoggedIn}
+          />
+        );
+      case "mis-citas":
+        return (
+          <MyCitations
+            navigate={navigate}
+            isLoggedIn={isLoggedIn}
+            setIsLoggedIn={setIsLoggedIn}
+          />
+        );
+      case "perfil":
+        return (
+          <MiPerfil
+            navigate={navigate}
+            isLoggedIn={isLoggedIn}
+            setIsLoggedIn={setIsLoggedIn}
+          />
+        );
+      // Asegúrate de que este case coincida con lo que pasas en el Navbar
+      case "directorio-medico":
+        return (
+          <DirectorioMedico
             navigate={navigate}
             isLoggedIn={isLoggedIn}
             setIsLoggedIn={setIsLoggedIn}

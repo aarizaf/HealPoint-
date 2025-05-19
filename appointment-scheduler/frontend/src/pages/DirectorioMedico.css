@@ -1,0 +1,482 @@
+/* DirectorioMedico.css - Estilos para el directorio médico */
+
+.directorioContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: calc(100vh - 64px);
+}
+
+.directorioHeader {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.directorioHeader h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.directorioHeader p {
+  font-size: 1.1rem;
+  color: var(--text-light);
+}
+
+/* Filtros y búsqueda */
+.directorioFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.searchBar {
+  flex: 1;
+  position: relative;
+  min-width: 250px;
+}
+
+.searchBar input {
+  width: 100%;
+  padding: 0.875rem 2.5rem 0.875rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  color: var(--text);
+}
+
+.searchBar input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.searchBar svg {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: var(--text-light);
+}
+
+.specialtyFilter {
+  width: 240px;
+}
+
+.specialtyFilter select {
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 16px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.specialtyFilter select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+/* Tarjetas de doctor */
+.doctorsList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.doctorCard {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.doctorCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.doctorPhoto {
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.doctorPhoto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.doctorCard:hover .doctorPhoto img {
+  transform: scale(1.05);
+}
+
+.doctorInfo {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  flex-grow: 1;
+}
+
+.doctorInfo h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.doctorSpecialty {
+  color: var(--primary);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.doctorMeta {
+  display: flex;
+  gap: 1.5rem;
+  color: var(--text-light);
+  font-size: 0.875rem;
+}
+
+.doctorMeta span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.doctorMeta svg {
+  color: var(--primary);
+}
+
+.doctorActions {
+  padding: 1rem 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.viewDetailBtn,
+.scheduleBtn {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  flex: 1;
+}
+
+.viewDetailBtn {
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.viewDetailBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.scheduleBtn {
+  background: var(--primary);
+  border: none;
+  color: white;
+}
+
+.scheduleBtn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+/* Loading state */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  grid-column: 1 / -1;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top: 3px solid var(--primary);
+  border-radius: 50%;
+  margin-bottom: 1.5rem;
+  animation: spin 1s linear infinite;
+}
+
+/* No results state */
+.noResultsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  grid-column: 1 / -1;
+  color: var(--text-light);
+}
+
+.noResultsContainer svg {
+  color: var(--text-light);
+  opacity: 0.5;
+  margin-bottom: 1rem;
+}
+
+.noResultsContainer h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.noResultsContainer p {
+  margin-bottom: 1.5rem;
+}
+
+.noResultsContainer button {
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--primary);
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.noResultsContainer button:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+/* Vista detallada de doctor */
+.doctorDetailCard {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  position: relative;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.closeDetailBtn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 10;
+  color: var(--text-light);
+  transition: all 0.2s ease;
+}
+
+.closeDetailBtn:hover {
+  transform: rotate(90deg);
+  color: var(--primary);
+}
+
+.closeDetailBtn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.doctorDetailHeader {
+  display: flex;
+  padding: 2rem;
+  background: linear-gradient(to right, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.1));
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+}
+
+.doctorDetailPhoto {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-right: 2rem;
+}
+
+.doctorDetailInfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.doctorDetailInfo h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.doctorRating {
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.stars {
+  display: flex;
+  margin-right: 0.75rem;
+}
+
+.star {
+  color: #d1d5db;
+  margin-right: 0.125rem;
+}
+
+.star.filled {
+  color: #fbbf24;
+}
+
+.ratingValue {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.doctorDetailBody {
+  padding: 2rem;
+}
+
+.detailSection {
+  margin-bottom: 2rem;
+}
+
+.detailSection h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.detailSection h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: var(--primary);
+}
+
+.detailSection p {
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.detailItem h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.detailItem p {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.scheduleWithDoctorBtn {
+  width: 100%;
+  padding: 1rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+}
+
+.scheduleWithDoctorBtn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .directorioHeader h1 {
+    font-size: 2rem;
+  }
+  
+  .doctorsList {
+    grid-template-columns: 1fr;
+  }
+  
+  .doctorDetailHeader {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .doctorDetailPhoto {
+    margin-right: 0;
+    margin-bottom: 1.5rem;
+  }
+  
+  .doctorRating {
+    justify-content: center;
+  }
+  
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+}
