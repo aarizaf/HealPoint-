@@ -157,8 +157,9 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
       items: [
         { name: "Asignar cita médica", path: "cita-medica" },
         { name: "Especialidades", path: "servicios/especialidades" },
-        { name: "Exámenes", path: "servicios/examenes" },
+        
         { name: "Tratamientos", path: "servicios/tratamientos" },
+        { name: "Medicamentos", path: "servicios/Medicamentos" },
       ],
     },
     {
@@ -167,22 +168,12 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
       dropdown: true,
       items: [
         { name: "Directorio Médico", path: "doctores/directorio" },
-        { name: "Especialistas", path: "doctores/especialistas" },
-        { name: "Horarios", path: "doctores/horarios" },
-        { name: "Calificaciones", path: "doctores/calificaciones" },
+     
+     
+        
       ],
     },
-    {
-      name: "Pacientes",
-      path: "pacientes",
-      dropdown: true,
-      items: [
-        { name: "Portal del Paciente", path: "pacientes/portal" },
-        { name: "Historial Médico", path: "pacientes/historial" },
-        { name: "Mis Citas", path: "mis-citas" },
-        { name: "Medicamentos", path: "pacientes/medicamentos" },
-      ],
-    },
+  
     { name: "Contacto", path: "contacto" },
   ];
 
@@ -216,13 +207,13 @@ const HomePage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
       "mis-citas",
       "servicios/examenes",
       "servicios/tratamientos",
+      "servicios/medicamentos",
       "doctores/directorio",
       "doctores/especialistas",
       "doctores/horarios",
       "doctores/calificaciones",
       "pacientes/portal",
       "pacientes/historial",
-      "pacientes/medicamentos",
     ];
 
     // If protected and user is not logged in, redirect to login

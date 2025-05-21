@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "./DirectorioMedico.css";
 import Navbar from "./Navbar";
-
+import doctora1 from  "../imgs/doctora1.jpg"
+import doctor2 from  "../imgs/doctor2.jpg"
+import doctor3 from  "../imgs/doctor3.jpg"
+import doctora4 from  "../imgs/doctora4.jpg"
+import doctor5 from  "../imgs/doctor5.jpg"
+import doctora6 from  "../imgs/doctora6.jpeg"
+import doctor7 from  "../imgs/doctor7.jpg"
+import doctora8 from  "../imgs/doctora8.jpg"
 const DirectorioMedico = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,11 +33,11 @@ const DirectorioMedico = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
             rating: 4.8,
             experience: "12 años",
             education: "Universidad Nacional de Colombia",
-            photo: "https://randomuser.me/api/portraits/women/44.jpg",
+            photo: doctora1,
             bio: "Especialista en medicina familiar con enfoque en prevención y cuidado integral. Experiencia en manejo de enfermedades crónicas y promoción de estilos de vida saludables.",
-            workdays: "Lunes a Viernes",
-            workhours: "8:00 AM - 6:00 PM",
-            languages: ["Español", "Inglés"]
+            languages: ["Español", "Inglés"],
+            certifications: ["Medicina Familiar", "Atención Primaria"],
+            areas: ["Prevención", "Enfermedades crónicas", "Medicina preventiva"]
           },
           {
             id: "2",
@@ -39,11 +46,11 @@ const DirectorioMedico = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
             rating: 4.9,
             experience: "15 años",
             education: "Universidad de Los Andes",
-            photo: "https://randomuser.me/api/portraits/men/29.jpg",
+            photo: doctor2,
             bio: "Cardiólogo intervencionista con amplia experiencia en procedimientos diagnósticos y tratamiento de enfermedades cardiovasculares complejas.",
-            workdays: "Martes, Jueves y Viernes",
-            workhours: "9:00 AM - 5:00 PM",
-            languages: ["Español", "Inglés", "Francés"]
+            languages: ["Español", "Inglés", "Francés"],
+            certifications: ["Cardiología Intervencionista", "Ecocardiografía"],
+            areas: ["Enfermedades coronarias", "Hipertensión", "Arritmias"]
           },
           {
             id: "3",
@@ -52,11 +59,11 @@ const DirectorioMedico = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
             rating: 4.7,
             experience: "8 años",
             education: "Universidad del Rosario",
-            photo: "https://randomuser.me/api/portraits/men/32.jpg",
+            photo: doctor3,
             bio: "Pediatra con enfoque en el desarrollo infantil y adolescente. Experiencia en manejo de enfermedades infecciosas y trastornos del crecimiento.",
-            workdays: "Lunes, Miércoles y Viernes",
-            workhours: "7:00 AM - 3:00 PM",
-            languages: ["Español"]
+            languages: ["Español"],
+            certifications: ["Pediatría General", "Desarrollo Infantil"],
+            areas: ["Crecimiento y desarrollo", "Vacunación", "Pediatría preventiva"]
           },
           {
             id: "4",
@@ -65,11 +72,11 @@ const DirectorioMedico = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
             rating: 4.6,
             experience: "10 años",
             education: "Universidad Javeriana",
-            photo: "https://randomuser.me/api/portraits/women/64.jpg",
+            photo: doctora4,
             bio: "Dermatóloga con especialidad en tratamientos estéticos y manejo de enfermedades de la piel. Experiencia en procedimientos quirúrgicos dermatológicos.",
-            workdays: "Lunes a Jueves",
-            workhours: "10:00 AM - 7:00 PM",
-            languages: ["Español", "Portugués"]
+            languages: ["Español", "Portugués"],
+            certifications: ["Dermatología Clínica", "Dermatología Estética"],
+            areas: ["Acné", "Dermatitis", "Procedimientos estéticos"]
           },
           {
             id: "5",
@@ -78,11 +85,11 @@ const DirectorioMedico = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
             rating: 4.9,
             experience: "20 años",
             education: "Universidad de Barcelona",
-            photo: "https://randomuser.me/api/portraits/men/52.jpg",
+            photo: doctor5,
             bio: "Neurólogo con amplia experiencia en trastornos neurológicos complejos. Especialista en epilepsia y enfermedad de Parkinson.",
-            workdays: "Martes a Sábado",
-            workhours: "8:00 AM - 4:00 PM",
-            languages: ["Español", "Inglés", "Catalán"]
+            languages: ["Español", "Inglés", "Catalán"],
+            certifications: ["Neurología Clínica", "Electroencefalografía"],
+            areas: ["Epilepsia", "Parkinson", "Cefaleas", "Deterioro cognitivo"]
           },
           {
             id: "6",
@@ -91,11 +98,11 @@ const DirectorioMedico = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
             rating: 4.8,
             experience: "14 años",
             education: "Universidad Nacional Autónoma",
-            photo: "https://randomuser.me/api/portraits/women/87.jpg",
+            photo: doctora6,
             bio: "Ginecóloga especializada en salud reproductiva y atención prenatal. Experiencia en cirugías mínimamente invasivas.",
-            workdays: "Lunes, Martes, Jueves y Viernes",
-            workhours: "8:00 AM - 6:00 PM",
-            languages: ["Español", "Inglés"]
+            languages: ["Español", "Inglés"],
+            certifications: ["Ginecología y Obstetricia", "Colposcopía"],
+            areas: ["Salud reproductiva", "Control prenatal", "Menopausia"]
           },
           {
             id: "7",
@@ -104,11 +111,11 @@ const DirectorioMedico = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
             rating: 4.7,
             experience: "11 años",
             education: "Universidad de Harvard",
-            photo: "https://randomuser.me/api/portraits/men/81.jpg",
+            photo: doctor7,
             bio: "Oftalmólogo especializado en cirugía refractiva y tratamiento de enfermedades de la retina. Experiencia en nuevas tecnologías para corrección visual.",
-            workdays: "Miércoles a Domingo",
-            workhours: "9:00 AM - 5:00 PM",
-            languages: ["Español", "Inglés"]
+            languages: ["Español", "Inglés"],
+            certifications: ["Oftalmología Quirúrgica", "Retinología"],
+            areas: ["Cirugía refractiva", "Cataratas", "Glaucoma", "Retina"]
           },
           {
             id: "8",
@@ -117,11 +124,11 @@ const DirectorioMedico = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
             rating: 4.5,
             experience: "9 años",
             education: "Universidad Complutense",
-            photo: "https://randomuser.me/api/portraits/women/72.jpg",
+            photo: doctora8,
             bio: "Nutricionista especializada en trastornos alimentarios y nutrición deportiva. Enfoque en planes alimenticios personalizados y educación nutricional.",
-            workdays: "Lunes a Viernes",
-            workhours: "7:00 AM - 3:00 PM",
-            languages: ["Español", "Italiano"]
+            languages: ["Español", "Italiano"],
+            certifications: ["Nutrición Clínica", "Nutrición Deportiva"],
+            areas: ["Trastornos alimenticios", "Dietas especializadas", "Nutrición deportiva"]
           }
         ];
         
@@ -156,13 +163,6 @@ const DirectorioMedico = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
     setSelectedDoctor(null);
   };
 
-  // Programar cita con doctor seleccionado
-  const scheduleAppointment = (doctorId) => {
-    // Aquí podrías guardar el ID del doctor en localStorage o estado global
-    localStorage.setItem("selectedDoctorId", doctorId);
-    navigate("cita-medica");
-  };
-
   return (
     <>
       <Navbar
@@ -174,7 +174,7 @@ const DirectorioMedico = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
       <div className="directorioContainer">
         <div className="directorioHeader">
           <h1>Directorio Médico</h1>
-          <p>Encuentre al especialista adecuado para su atención médica</p>
+          <p>Conozca a nuestro equipo de profesionales de la salud</p>
         </div>
         
         {/* Filtros y Búsqueda */}
@@ -239,6 +239,15 @@ const DirectorioMedico = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                 <p>{selectedDoctor.bio}</p>
               </div>
               
+              <div className="detailSection">
+                <h3>Áreas de especialización</h3>
+                <div className="areasTags">
+                  {selectedDoctor.areas && selectedDoctor.areas.map((area, index) => (
+                    <span key={index} className="areaTag">{area}</span>
+                  ))}
+                </div>
+              </div>
+              
               <div className="detailGrid">
                 <div className="detailItem">
                   <h4>Experiencia</h4>
@@ -249,25 +258,23 @@ const DirectorioMedico = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                   <p>{selectedDoctor.education}</p>
                 </div>
                 <div className="detailItem">
-                  <h4>Días laborales</h4>
-                  <p>{selectedDoctor.workdays}</p>
-                </div>
-                <div className="detailItem">
-                  <h4>Horario</h4>
-                  <p>{selectedDoctor.workhours}</p>
-                </div>
-                <div className="detailItem">
                   <h4>Idiomas</h4>
                   <p>{selectedDoctor.languages.join(", ")}</p>
                 </div>
+                <div className="detailItem">
+                  <h4>Certificaciones</h4>
+                  <p>{selectedDoctor.certifications ? selectedDoctor.certifications.join(", ") : "No especificado"}</p>
+                </div>
               </div>
               
-              <button 
-                className="scheduleWithDoctorBtn"
-                onClick={() => scheduleAppointment(selectedDoctor.id)}
-              >
-                Agendar cita con {selectedDoctor.name.split(" ")[0]}
-              </button>
+              <div className="infoNote">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <p>Para conocer la disponibilidad, inicie sesión y use la opción "Agendar Cita Médica" en el menú principal.</p>
+              </div>
             </div>
           </div>
         )}
@@ -307,11 +314,8 @@ const DirectorioMedico = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                       </div>
                     </div>
                     <div className="doctorActions">
-                      <button className="viewDetailBtn" onClick={() => viewDoctorDetails(doctor)}>
-                        Ver detalles
-                      </button>
-                      <button className="scheduleBtn" onClick={() => scheduleAppointment(doctor.id)}>
-                        Agendar cita
+                      <button className="viewDetailBtn fullWidth" onClick={() => viewDoctorDetails(doctor)}>
+                        Ver perfil completo
                       </button>
                     </div>
                   </div>

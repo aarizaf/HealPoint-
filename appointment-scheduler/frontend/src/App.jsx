@@ -6,7 +6,9 @@ import MedicalAppointment from "./pages/MedicalAppointment";
 import ContactPage from "./pages/ContactPage";
 import MyCitations from "./pages/Mycitations";
 import MiPerfil from "./pages/Miperfil";
-import DirectorioMedico from "./pages/DirectorioMedico"; // Verificar que esta ruta sea correcta
+import DirectorioMedico from "./pages/DirectorioMedico";
+import Medicamentos from "./pages/Medicamentos";
+import Tratamientos from "./pages/Tratamientos"; // Importamos el nuevo componente
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -77,10 +79,26 @@ function App() {
             setIsLoggedIn={setIsLoggedIn}
           />
         );
-      // Asegúrate de que este case coincida con lo que pasas en el Navbar
-      case "directorio-medico":
+      case "doctores/directorio":
         return (
           <DirectorioMedico
+            navigate={navigate}
+            isLoggedIn={isLoggedIn}
+            setIsLoggedIn={setIsLoggedIn}
+          />
+        );
+      case "servicios/Medicamentos":
+        return (
+          <Medicamentos
+            navigate={navigate}
+            isLoggedIn={isLoggedIn}
+            setIsLoggedIn={setIsLoggedIn}
+          />
+        );
+      // Añadimos la nueva ruta para Tratamientos
+      case "servicios/tratamientos":
+        return (
+          <Tratamientos
             navigate={navigate}
             isLoggedIn={isLoggedIn}
             setIsLoggedIn={setIsLoggedIn}

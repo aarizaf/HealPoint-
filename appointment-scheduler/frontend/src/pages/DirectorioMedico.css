@@ -28,14 +28,18 @@
 .directorioFilters {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 2rem; /* Aumentado a 2rem para mayor separación */
   margin-bottom: 2rem;
+  align-items: center;
+  justify-content: space-between; /* Distribuir espacio entre elementos */
 }
 
 .searchBar {
-  flex: 1;
+  flex: 1; /* Aumentado de 0.6 a 0.7 para hacerla un poco más larga */
   position: relative;
-  min-width: 250px;
+  min-width: 300px;
+  max-width: 850px; /* Aumentado de 400px a 500px */
+  margin-right: 20px; /* Aumentado a 30px para más separación */
 }
 
 .searchBar input {
@@ -66,6 +70,7 @@
 
 .specialtyFilter {
   width: 240px;
+  flex-shrink: 0; /* Evitar que se comprima */
 }
 
 .specialtyFilter select {
@@ -368,7 +373,7 @@
 }
 
 .detailSection {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .detailSection h3 {
@@ -436,6 +441,78 @@
   box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
 }
 
+/* Añadir estos estilos adicionales al final del archivo DirectorioMedico.css */
+
+/* Estilos para botón de ancho completo */
+.viewDetailBtn.fullWidth {
+  width: 100%;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.viewDetailBtn.fullWidth::after {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18l6-6-6-6'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: transform 0.2s ease;
+}
+
+.viewDetailBtn.fullWidth:hover::after {
+  transform: translateX(3px);
+}
+
+/* Áreas de especialización */
+.areasTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.areaTag {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--primary);
+  padding: 0.35rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Nota informativa */
+.infoNote {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem;
+  background-color: #F3F4F6;
+  border-radius: 0.5rem;
+  margin-top: 1.5rem;
+  color: #4B5563;
+  align-items: flex-start;
+}
+
+.infoNote svg {
+  color: #10B981;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.infoNote p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Espaciado adicional para las secciones */
+.detailSection {
+  margin-bottom: 1.5rem;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -478,5 +555,21 @@
   
   .detailGrid {
     grid-template-columns: 1fr;
+  }
+
+  .searchBar {
+    flex: 1;
+    max-width: 100%;
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .directorioFilters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .specialtyFilter {
+    width: 100%;
   }
 }

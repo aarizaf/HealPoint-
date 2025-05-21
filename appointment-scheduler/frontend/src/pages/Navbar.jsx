@@ -157,8 +157,9 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn, navigate }) => {
       items: [
         { name: "Asignar cita médica", path: "servicios/urgencias" },
         { name: "Especialidades", path: "servicios/especialidades" },
-        { name: "Exámenes", path: "servicios/examenes" },
+      
         { name: "Tratamientos", path: "servicios/tratamientos" },
+        { name: "Medicamentos", path: "servicios/Medicamentos" },
       ],
     },
     {
@@ -166,21 +167,10 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn, navigate }) => {
       dropdown: true,
       items: [
         { name: "Directorio Médico", path: "doctores/directorio" },
-        { name: "Especialistas", path: "doctores/especialistas" },
-        { name: "Horarios", path: "doctores/horarios" },
-        { name: "Calificaciones", path: "doctores/calificaciones" },
+        
       ],
     },
-    {
-      name: "Pacientes",
-      dropdown: true,
-      items: [
-        { name: "Portal del Paciente", path: "pacientes/portal" },
-        { name: "Historial Médico", path: "pacientes/historial" },
-        { name: "Próximas Citas", path: "pacientes/citas" },
-        { name: "Medicamentos", path: "pacientes/medicamentos" },
-      ],
-    },
+    
     { name: "Contacto", path: "contacto" },
   ];
 
