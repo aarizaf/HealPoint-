@@ -43,19 +43,18 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn, navigate }) => {
   };
 
   const handleNavigate = (path) => {
-    const protectedPaths = [
-      "servicios/urgencias",
-      "servicios/especialidades",
+   const protectedPaths = [
+      "cita-medica",
+      "mis-citas",
       "servicios/examenes",
       "servicios/tratamientos",
+      "servicios/medicamentos",
       "doctores/directorio",
       "doctores/especialistas",
       "doctores/horarios",
       "doctores/calificaciones",
       "pacientes/portal",
       "pacientes/historial",
-      "pacientes/citas",
-      "pacientes/medicamentos",
     ];
 
     if (protectedPaths.includes(path) && !isLoggedIn) {
@@ -118,7 +117,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn, navigate }) => {
               </button>
               <button
                 className="userMenuItem"
-                onClick={() => handleNavigate("pacientes/citas")}
+                onClick={() => handleNavigate("mis-citas")} // Cambiar pacientes/citas a mis-citas
               >
                 Mis Citas
               </button>
@@ -155,7 +154,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn, navigate }) => {
       name: "Servicios",
       dropdown: true,
       items: [
-        { name: "Asignar cita médica", path: "servicios/urgencias" },
+        { name: "Asignar cita médica", path: "cita-medica" },
         { name: "Especialidades", path: "servicios/especialidades" },
       
         { name: "Tratamientos", path: "servicios/tratamientos" },
@@ -367,7 +366,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn, navigate }) => {
               <button
                 className="mobileNavLink mobileMenuItem"
                 onClick={() => {
-                  handleNavigate("pacientes/citas");
+                  handleNavigate("mis-citas"); // Cambiar pacientes/citas a mis-citas
                   setMenuOpen(false);
                 }}
               >
