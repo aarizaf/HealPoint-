@@ -6,10 +6,10 @@ from typing import Generator
 
 # Credenciales de base de datos directamente en el código
 DB_USER = "root"
-DB_PASSWORD = "sebastianolivo"
+DB_PASSWORD = "password"
 DB_HOST = "localhost"
-DB_PORT = "3306"
-DB_NAME = "healpoint"
+DB_PORT = "3307"
+DB_NAME = "healpointt"
 
 # Configuración de la conexión
 DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"

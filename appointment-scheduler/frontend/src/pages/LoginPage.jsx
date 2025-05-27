@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import axios from "axios";
 import medicoImage from "../imgs/medicos.jpg";
 import "./AuthPages.css";
+
+const API_URL = "http://localhost:8000"; 
 
 const LoginPage = ({ navigate, setIsLoggedIn }) => {
   const [formData, setFormData] = useState({
@@ -18,38 +21,49 @@ const LoginPage = ({ navigate, setIsLoggedIn }) => {
       ...formData,
       [name]: type === "checkbox" ? checked : value,
     });
+    
+    if (error) setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    
     try {
       console.log("Intentando iniciar sesión con:", formData);
 
-      // Simula la espera del servidor
-      await new Promise((r) => setTimeout(r, 1000));
-      const validEmail = "test@demo.com";
-      const validPassword = "12344";
+     
+      const response = await axios.post(`${API_URL}/login/`, {
+        correo: formData.email,         
+        contraseña: formData.password,  
+        rememberMe: formData.rememberMe
+      });
 
-      if (
-        formData.email === validEmail &&
-        formData.password === validPassword
-      ) {
-        // Store both login state and user email
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userEmail", formData.email);
-        setIsLoggedIn(true);
-        navigate("home");
+      console.log("Login exitoso:", response.data);
+      
+     
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userEmail", response.data.correo);
+      localStorage.setItem("userName", response.data.nombre);
+      localStorage.setItem("userId", response.data.id);
+      localStorage.setItem("userToken", response.data.token);
+      localStorage.setItem("userCedula", response.data.cedula);
+      
+     
+      setIsLoggedIn(true);
+      
+     
+      navigate("home");
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+      
+      
+      if (error.response && error.response.data) {
+        setError(error.response.data.detail || "Error al iniciar sesión. Verifica tus credenciales.");
       } else {
-        // For demo purposes, accept any credentials
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userEmail", formData.email);
-        setIsLoggedIn(true);
-        navigate("home");
+        setError("No se pudo conectar con el servidor. Intenta más tarde.");
       }
-    } catch {
-      setError("Credenciales incorrectas. Verifica email y contraseña.");
     } finally {
       setLoading(false);
     }
@@ -61,8 +75,8 @@ const LoginPage = ({ navigate, setIsLoggedIn }) => {
     try {
       console.log("Iniciando sesión con Google...");
       await new Promise((r) => setTimeout(r, 1000));
-      // Aquí iría la lógica de autenticación con Google
-      // navigate('dashboard');
+      
+      setError("La autenticación con Google no está disponible en este momento.");
     } catch (err) {
       console.error("Error al iniciar sesión con Google:", err);
       setError(

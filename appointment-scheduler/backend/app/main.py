@@ -1,16 +1,15 @@
 from fastapi import FastAPI, Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware  # Añadir esta importación
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_
-from typing import List
+from sqlalchemy import and_, or_, text
+from typing import List, Optional
+from pydantic import BaseModel, EmailStr, validator
 import traceback
+import time
+import hashlib
 from datetime import datetime, date
 from passlib.context import CryptContext
-from .schemas import PacienteCreate, PacienteResponse
-from .database import get_db, check_database_connection
-from .models import Usuario, Paciente, Medico, HorarioSlot, Cita
-from .schemas import UsuarioResponse, CitaCreate, CitaResponse, HorarioSlotResponse
 from .database import get_db, check_database_connection
 from .models import Usuario, Paciente, Medico, HorarioSlot, Cita
 from .schemas import UsuarioResponse, CitaCreate, CitaResponse, HorarioSlotResponse
@@ -34,37 +33,61 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def get_password_hash(password):
     return pwd_context.hash(password)
 
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
 
 
+# Modelo para solicitud de login
+class LoginRequest(BaseModel):
+    correo: EmailStr
+    contraseña: str
+    rememberMe: bool = False
+
+# Modelo para respuesta de login
+class LoginResponse(BaseModel):
+    id: int
+    nombre: str
+    correo: str
+    cedula: str
+    token: str
 
 
+# Actualiza el schema PacienteCreate para coincidir con el frontend
+class PacienteCreate(BaseModel):
+    nombre: str
+    correo: EmailStr
+    cedula: str
+    contraseña: str
+    telefono: Optional[str] = None
+    genero: Optional[str] = "no especificado"
+    fecha_nacimiento: Optional[date] = None
+    
+    @validator('cedula')
+    def cedula_valida(cls, v):
+        if not v or len(v) < 5:
+            raise ValueError('La cédula debe tener al menos 5 caracteres')
+        return v
+    
+    @validator('contraseña')
+    def password_strength(cls, v):
+        if len(v) < 8:
+            raise ValueError('La contraseña debe tener al menos 8 caracteres')
+        return v
 
-@app.middleware("http")
-async def catch_exceptions_middleware(request: Request, call_next):
-    try:
-        return await call_next(request)
-    except Exception as e:
-        error_detail = f"Error: {str(e)}\n{traceback.format_exc()}"
-        print(error_detail)  # Para ver el error en los logs
-        return JSONResponse(
-            status_code=500,
-            content={"message": "Internal Server Error", "detail": str(e)}
-        )
+# Actualiza la respuesta para reflejar la estructura real de la tabla
+class PacienteResponse(BaseModel):
+    id: int
+    nombre: str
+    correo: str
+    cedula: str
+    telefono: Optional[str]
+    genero: str
+    fecha_nacimiento: Optional[date]
+    fecha_registro: datetime
+    
+    class Config:
+        from_attributes = True
 
-@app.get("/")
-def read_root():
-    return {"message": "Bienvenido a la API de HealPoint"}
-
-@app.get("/check-db/")
-def check_db():
-    """
-    Verifica la conexión a la base de datos
-    """
-    result = check_database_connection()
-    if result:
-        return {"status": "ok", "message": "Conexión a la base de datos exitosa"}
-    else:
-        raise HTTPException(status_code=500, detail="Error de conexión a la base de datos")
 
 @app.get("/usuarios/", response_model=List[UsuarioResponse])
 def get_usuarios(db: Session = Depends(get_db)):
@@ -74,7 +97,7 @@ def get_usuarios(db: Session = Depends(get_db)):
     usuarios = db.query(Usuario).all()
     return usuarios
 
-# Endpoint para ver slots disponibles por médico y fecha
+
 @app.get("/slots-disponibles/{id_medico}", response_model=List[HorarioSlotResponse])
 def get_slots_disponibles(
     id_medico: int, 
@@ -220,57 +243,135 @@ def get_citas_paciente(
             detail=f"Error al buscar citas del paciente: {str(e)}"
         )
         
-
+# Endpoint para iniciar sesión
+@app.post("/login/", response_model=LoginResponse)
+def login(login_data: LoginRequest, db: Session = Depends(get_db)):
+    """
+    Autentica a un usuario en el sistema
+    """
+    try:
+        # 1. Buscar al paciente por correo
+        paciente = db.execute(
+            text("SELECT * FROM pacientes WHERE correo = :correo"),
+            {"correo": login_data.correo}
+        ).fetchone()
+        
+        # 2. Verificar si el paciente existe
+        if not paciente:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Correo o contraseña incorrectos"
+            )
+        
+        # 3. Verificar la contraseña
+        if not verify_password(login_data.contraseña, paciente.contraseña):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Correo o contraseña incorrectos"
+            )
+        
+        # 4. Generar un token simple (en una aplicación real, usarías JWT)
+        timestamp = str(int(time.time()))
+        token_data = f"{paciente.id}:{timestamp}:healpoint-secret-key"
+        token = hashlib.sha256(token_data.encode()).hexdigest()
+        
+        # 5. Devolver información del paciente y token
+        return {
+            "id": paciente.id,
+            "nombre": paciente.nombre,
+            "correo": paciente.correo,
+            "cedula": paciente.cedula,
+            "token": token
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error en el login: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error en el proceso de login: {str(e)}"
+        )
 
 # Endpoint para registrar un nuevo paciente
-# Modifica tu endpoint para usar la cédula como identificador adicional
-
 @app.post("/pacientes/", response_model=PacienteResponse, status_code=status.HTTP_201_CREATED)
 def registrar_paciente(
     paciente_data: PacienteCreate,
     db: Session = Depends(get_db)
 ):
     """
-    Registra un nuevo paciente en el sistema, creando un usuario asociado
+    Registra un nuevo paciente en el sistema según la estructura de la tabla pacientes
     """
     try:
         # 1. Verificar que el correo no esté ya registrado
-        usuario_existente = db.query(Usuario).filter(Usuario.correo == paciente_data.correo).first()
-        if usuario_existente:
+        paciente_existente = db.execute(
+            text("SELECT * FROM pacientes WHERE correo = :correo"),
+            {"correo": paciente_data.correo}
+        ).fetchone()
+        
+        if paciente_existente:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Este correo electrónico ya está registrado"
             )
         
-        # 2. Crear nuevo usuario
+        # 2. Verificar que la cédula no esté ya registrada
+        paciente_existente = db.execute(
+            text("SELECT * FROM pacientes WHERE cedula = :cedula"),
+            {"cedula": paciente_data.cedula}
+        ).fetchone()
+        
+        if paciente_existente:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Esta cédula ya está registrada en el sistema"
+            )
+        
+        # 3. Encriptar la contraseña
         hashed_password = get_password_hash(paciente_data.contraseña)
-        nuevo_usuario = Usuario(
-            nombre=paciente_data.nombre,
-            correo=paciente_data.correo,
-            contraseña=hashed_password,
-            rol="paciente",
-            estado=True
-        )
         
-        db.add(nuevo_usuario)
-        db.flush()  # Para obtener el ID del usuario
+        # 4. Insertar nuevo paciente
+        fecha_nacimiento_sql = paciente_data.fecha_nacimiento.isoformat() if paciente_data.fecha_nacimiento else None
         
-        # 3. Crear nuevo paciente asociado al usuario
-        nuevo_paciente = Paciente(
-            id_usuario=nuevo_usuario.id_usuario,
-            fecha_nacimiento=paciente_data.fecha_nacimiento,
-            genero=paciente_data.genero,
-            telefono=paciente_data.telefono or paciente_data.cedula  # Usar cédula como teléfono si no hay teléfono
-        )
+        query = text("""
+            INSERT INTO pacientes 
+            (nombre, correo, cedula, contraseña, telefono, genero, fecha_nacimiento)
+            VALUES 
+            (:nombre, :correo, :cedula, :contrasena, :telefono, :genero, :fecha_nacimiento)
+        """)
         
-        db.add(nuevo_paciente)
+        result = db.execute(query, {
+            "nombre": paciente_data.nombre,
+            "correo": paciente_data.correo,
+            "cedula": paciente_data.cedula,
+            "contrasena": hashed_password,
+            "telefono": paciente_data.telefono,
+            "genero": paciente_data.genero,
+            "fecha_nacimiento": fecha_nacimiento_sql
+        })
+        
         db.commit()
-        db.refresh(nuevo_paciente)
         
-        # 4. Asignar el usuario al paciente para la respuesta
-        nuevo_paciente.usuario = nuevo_usuario
+        # 5. Obtener el paciente recién creado
+        nuevo_paciente = db.execute(
+            text("SELECT * FROM pacientes WHERE cedula = :cedula"),
+            {"cedula": paciente_data.cedula}
+        ).fetchone()
         
-        return nuevo_paciente
+        # Convertir el resultado a un diccionario para devolverlo
+        paciente_dict = {
+            "id": nuevo_paciente.id,
+            "nombre": nuevo_paciente.nombre,
+            "correo": nuevo_paciente.correo,
+            "cedula": nuevo_paciente.cedula,
+            "telefono": nuevo_paciente.telefono,
+            "genero": nuevo_paciente.genero,
+            "fecha_nacimiento": nuevo_paciente.fecha_nacimiento,
+            "fecha_registro": nuevo_paciente.fecha_registro
+        }
+        
+        return paciente_dict
         
     except HTTPException:
         db.rollback()
@@ -282,4 +383,38 @@ def registrar_paciente(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al registrar paciente: {str(e)}"
+        )
+
+# Endpoint para obtener todos los pacientes
+@app.get("/pacientes/", response_model=List[PacienteResponse])
+def get_pacientes(db: Session = Depends(get_db)):
+    """
+    Obtiene todos los pacientes registrados en el sistema
+    """
+    try:
+        # Usar consulta SQL directa para obtener los pacientes
+        pacientes_raw = db.execute(text("SELECT * FROM pacientes")).fetchall()
+        
+        # Convertir los resultados a la estructura esperada
+        pacientes = []
+        for p in pacientes_raw:
+            pacientes.append({
+                "id": p.id,
+                "nombre": p.nombre,
+                "correo": p.correo,
+                "cedula": p.cedula,
+                "telefono": p.telefono,
+                "genero": p.genero,
+                "fecha_nacimiento": p.fecha_nacimiento,
+                "fecha_registro": p.fecha_registro
+            })
+            
+        return pacientes
+    
+    except Exception as e:
+        print(f"Error al obtener pacientes: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener pacientes: {str(e)}"
         )

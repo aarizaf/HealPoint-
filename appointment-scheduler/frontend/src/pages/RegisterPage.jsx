@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import axios from "axios"; // Asegúrate de tener axios instalado: npm install axios
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import medicoImage from "../imgs/medicos.jpg";
 import "./AuthPages.css";
 
@@ -12,15 +12,23 @@ const RegisterPage = ({ navigate }) => {
     cedula: "",
     password: "",
     confirmPassword: "",
-    genero: "", // Añadido para el backend
-    telefono: "", // Añadido para el backend
-    fecha_nacimiento: "", // Añadido para el backend
+    genero: "", 
+    telefono: "", 
+    fecha_nacimiento: "",
     aceptaTerminos: false,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const isMounted = React.useRef(true);
+
+  // Limpiar la referencia cuando el componente se desmonte
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -28,12 +36,35 @@ const RegisterPage = ({ navigate }) => {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    
+    // Limpiar mensajes de error cuando el usuario modifica un campo
+    if (error) setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccessMessage("");
+
+    // Validaciones del lado del cliente
+    if (formData.nombre.trim().length < 3) {
+      setError("El nombre debe tener al menos 3 caracteres");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.cedula.trim().length < 5) {
+      setError("La cédula debe tener al menos 5 caracteres");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setError("La contraseña debe tener al menos 8 caracteres");
+      setLoading(false);
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       setError("Las contraseñas no coinciden");
@@ -42,14 +73,21 @@ const RegisterPage = ({ navigate }) => {
     }
 
     try {
+      // Formatear fecha si existe
+      let fechaNacimiento = null;
+      if (formData.fecha_nacimiento) {
+        fechaNacimiento = new Date(formData.fecha_nacimiento).toISOString().split('T')[0];
+      }
+
       // Preparar los datos para la API según la estructura esperada
       const pacienteData = {
         nombre: formData.nombre,
-        correo: formData.email, // Nota: correo en backend, email en frontend
-        contraseña: formData.password, // Nota: contraseña en backend, password en frontend
-        telefono: formData.telefono || formData.cedula, // Usar cédula como teléfono si no se proporciona
-        genero: formData.genero || "no especificado", // Valor por defecto
-        fecha_nacimiento: formData.fecha_nacimiento || null, // Opcional
+        correo: formData.email,                // Corresponde a 'correo' en el backend
+        cedula: formData.cedula,               // Campo obligatorio
+        contraseña: formData.password,         // Corresponde a 'contraseña' en el backend
+        telefono: formData.telefono || null,
+        genero: formData.genero || "no especificado",
+        fecha_nacimiento: fechaNacimiento,
       };
 
       console.log("Enviando datos al servidor:", pacienteData);
@@ -59,8 +97,29 @@ const RegisterPage = ({ navigate }) => {
 
       console.log("Registro exitoso:", response.data);
 
-      // Redirigir o mostrar mensaje de éxito
-      navigate("registro-exitoso");
+      // Mostrar mensaje de éxito y redirigir
+      setSuccessMessage("¡Registro exitoso! Redirigiendo...");
+      
+      // Limpiar formulario
+      setFormData({
+        nombre: "",
+        email: "",
+        cedula: "",
+        password: "",
+        confirmPassword: "",
+        genero: "",
+        telefono: "",
+        fecha_nacimiento: "",
+        aceptaTerminos: false,
+      });
+      
+      // Redirigir después de un breve retraso
+      setTimeout(() => {
+        if (isMounted.current) {
+          navigate("registro-exitoso");
+        }
+      }, 2000);
+      
     } catch (error) {
       console.error("Error en el registro:", error);
 
@@ -113,6 +172,12 @@ const RegisterPage = ({ navigate }) => {
         {error && (
           <div className="errorAlert">
             <span>{error}</span>
+          </div>
+        )}
+        
+        {successMessage && (
+          <div className="successAlert">
+            <span>{successMessage}</span>
           </div>
         )}
 
