@@ -80,10 +80,15 @@ class PacienteResponse(BaseModel):
     nombre: str
     correo: str
     cedula: str
-    telefono: Optional[str]
+    telefono: Optional[str] = None
     genero: str
-    fecha_nacimiento: Optional[date]
+    fecha_nacimiento: Optional[date] = None
     fecha_registro: datetime
+    direccion: Optional[str] = None
+    grupo_sanguineo: Optional[str] = None
+    alergias: Optional[str] = None
+    antecedentes_medicos: Optional[str] = None
+    ciudad: Optional[str] = None
     
     class Config:
         from_attributes = True
@@ -556,4 +561,126 @@ def agendar_cita(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al agendar cita: {str(e)}"
+        )
+
+# Modelo para actualizar información del paciente
+class PacienteUpdate(BaseModel):
+    nombre: Optional[str] = None
+    telefono: Optional[str] = None
+    genero: Optional[str] = None
+    fecha_nacimiento: Optional[date] = None
+    direccion: Optional[str] = None
+    grupo_sanguineo: Optional[str] = None
+    alergias: Optional[str] = None
+    antecedentes_medicos: Optional[str] = None
+    ciudad: Optional[str] = None
+
+# Endpoint para obtener perfil de un paciente por ID
+@app.get("/pacientes/{paciente_id}", response_model=PacienteResponse)
+def get_paciente_by_id(
+    paciente_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene la información detallada de un paciente por su ID
+    """
+    try:
+        # Buscar paciente por ID
+        paciente = db.execute(
+            text("SELECT * FROM pacientes WHERE id = :id"),
+            {"id": paciente_id}
+        ).fetchone()
+        
+        if not paciente:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Paciente con ID {paciente_id} no encontrado"
+            )
+        
+        # Convertir a diccionario
+        paciente_dict = {
+            "id": paciente.id,
+            "nombre": paciente.nombre,
+            "correo": paciente.correo,
+            "cedula": paciente.cedula,
+            "telefono": paciente.telefono,
+            "genero": paciente.genero,
+            "fecha_nacimiento": paciente.fecha_nacimiento,
+            "fecha_registro": paciente.fecha_registro,
+            "direccion": getattr(paciente, "direccion", None),
+            "grupo_sanguineo": getattr(paciente, "grupo_sanguineo", None),
+            "alergias": getattr(paciente, "alergias", None),
+            "antecedentes_medicos": getattr(paciente, "antecedentes_medicos", None),
+            "ciudad": getattr(paciente, "ciudad", None)
+        }
+        
+        return paciente_dict
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error al obtener paciente: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener información del paciente: {str(e)}"
+        )
+
+# Endpoint para actualizar información del paciente
+@app.put("/pacientes/{paciente_id}", response_model=PacienteResponse)
+def update_paciente(
+    paciente_id: int,
+    paciente_update: PacienteUpdate,
+    db: Session = Depends(get_db)
+):
+    """
+    Actualiza la información de un paciente existente
+    """
+    try:
+        # Verificar que el paciente existe
+        paciente = db.execute(
+            text("SELECT * FROM pacientes WHERE id = :id"),
+            {"id": paciente_id}
+        ).fetchone()
+
+        if not paciente:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Paciente con ID {paciente_id} no encontrado"
+            )
+
+        # Preparar los campos a actualizar (solo los que se proporcionaron)
+        update_fields = {}
+        for field, value in paciente_update.dict(exclude_unset=True).items():
+            if value is not None:  # Solo incluir campos con valores no nulos
+                update_fields[field] = value
+
+        if not update_fields:
+            # Si no hay campos para actualizar, devolver los datos actuales
+            return get_paciente_by_id(paciente_id, db)
+
+        # Construir la consulta dinámica para actualizar solo los campos proporcionados
+        fields_str = ", ".join([f"{field} = :{field}" for field in update_fields])
+        query = text(f"UPDATE pacientes SET {fields_str} WHERE id = :id")
+
+        # Añadir el ID del paciente a los parámetros
+        update_fields["id"] = paciente_id
+
+        # Ejecutar la actualización
+        db.execute(query, update_fields)
+        db.commit()
+
+        # Devolver los datos actualizados
+        return get_paciente_by_id(paciente_id, db)
+
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as e:
+        db.rollback()
+        print(f"Error al actualizar paciente: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al actualizar información del paciente: {str(e)}"
         )

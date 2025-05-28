@@ -31,6 +31,11 @@ class Paciente(Base):
     genero = Column(String(20))
     fecha_nacimiento = Column(Date)
     fecha_registro = Column(DateTime, default=datetime.utcnow)
+    direccion = Column(String(255))
+    grupo_sanguineo = Column(String(5))
+    alergias = Column(Text)
+    antecedentes_medicos = Column(Text)
+    ciudad = Column(String(100))
     
     # Definir la relación con Cita correctamente
     citas = relationship("Cita", back_populates="paciente")

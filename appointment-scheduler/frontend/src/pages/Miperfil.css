@@ -208,6 +208,14 @@
   color: #10B981;
 }
 
+.sectionSubtitle {
+  font-size: 1.1rem;
+  color: #374151;
+  margin: 1.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
 .detailsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -401,6 +409,22 @@
   right: 12px;
   bottom: 12px;
   color: #9CA3AF;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #10B981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .formActions {
@@ -614,4 +638,46 @@
   .profileDetailsSection {
     padding: 1.25rem;
   }
+}
+
+/* Estilo para notas de campo */
+.fieldNote {
+  display: block;
+  font-size: 0.75rem;
+  color: #6B7280;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+/* Estilo para alertas informativas */
+.infoAlert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background-color: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  color: #1E40AF;
+  font-size: 0.875rem;
+}
+
+.infoAlert svg {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  color: #3B82F6;
+}
+
+/* Estilo para notas de cuáles campos se guardarán */
+.noteAlert {
+  background-color: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: #4B5563;
+  text-align: center;
 }

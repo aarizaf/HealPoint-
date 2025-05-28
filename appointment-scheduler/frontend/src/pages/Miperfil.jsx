@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Miperfil.css";
 import Navbar from "./Navbar";
+import axios from "axios";
 
-const MiPerfil = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
-  const [userData, setUserData] = useState({
+const API_URL = "http://localhost:8080";
+
+const MiPerfil = ({ navigate, isLoggedIn, setIsLoggedIn }) => {  const [userData, setUserData] = useState({
     nombre: "",
     apellido: "",
     email: "",
@@ -13,7 +15,10 @@ const MiPerfil = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
     genero: "",
     direccion: "",
     ciudad: "",
-    imgUrl: ""
+    imgUrl: "",
+    grupo_sanguineo: "",
+    alergias: "",
+    antecedentes_medicos: ""
   });
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -33,48 +38,101 @@ const MiPerfil = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
   });
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-
-  // Verificar si el usuario está logueado
+    // Verificar si el usuario está logueado
   useEffect(() => {
     if (!isLoggedIn) {
       navigate("login");
       return;
-    }
-
+    }    
+    
     // Cargar datos del usuario desde localStorage
     const userEmail = localStorage.getItem("userEmail");
-    if (!userEmail) {
+    const userId = localStorage.getItem("userId");
+    
+    console.log("Información de autenticación:", { userEmail, userId });
+    
+    if (!userEmail || !userId) {
+      console.error("Falta información de usuario en localStorage");
       navigate("login");
       return;
     }
 
-    // Simulamos la carga de datos (en una app real, esto vendría de una API)
-    setTimeout(() => {
-      const storedUserData = JSON.parse(localStorage.getItem(`userData_${userEmail}`) || "{}");
-      
-      // Si no hay datos específicos, usar un perfil predeterminado con el email
-      if (Object.keys(storedUserData).length === 0) {
-        const defaultData = {
-          nombre: userEmail.split("@")[0],
-          apellido: "",
-          email: userEmail,
-          telefono: "",
-          documento: "",
-          fechaNacimiento: "",
-          genero: "",
-          direccion: "",
-          ciudad: "",
-          imgUrl: `https://ui-avatars.com/api/?name=${userEmail.charAt(0)}&background=10B981&color=fff&size=200`
-        };
-        setUserData(defaultData);
-        // Guardar perfil predeterminado para futuras visitas
-        localStorage.setItem(`userData_${userEmail}`, JSON.stringify(defaultData));
-      } else {
-        setUserData(storedUserData);
+    // Cargar datos del usuario desde el backend
+    const fetchUserData = async () => {
+      setLoading(true);
+      setError("");
+        try {
+        // Obtener token de autenticación
+        const token = localStorage.getItem("userToken");
+        
+        // Obtener datos del usuario desde el endpoint
+        const response = await axios.get(`${API_URL}/pacientes/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const userData = response.data;
+          // Actualizar el estado con los datos del usuario
+        console.log("Datos recibidos del backend:", userData);        setUserData({
+          nombre: userData.nombre || "",
+          apellido: "", // El backend no tiene apellido separado
+          email: userData.correo || "",
+          telefono: userData.telefono || "",
+          documento: userData.cedula || "",
+          fechaNacimiento: userData.fecha_nacimiento || "",
+          genero: userData.genero || "",
+          direccion: userData.direccion || "",
+          ciudad: userData.ciudad || "", // El backend no tiene ciudad separada
+          imgUrl: `https://ui-avatars.com/api/?name=${userData.nombre.charAt(0)}&background=10B981&color=fff&size=200`, // Imagen generada con iniciales          grupo_sanguineo: userData.grupo_sanguineo || "",
+          alergias: userData.alergias || "",
+          antecedentes_medicos: userData.antecedentes_medicos || ""
+        });
+        
+        // Guardar en localStorage como respaldo
+        localStorage.setItem(`userData_${userEmail}`, JSON.stringify(userData));      } catch (err) {
+        console.error("Error al cargar datos del usuario:", err);
+        console.error("Detalles del error:", err.response?.data || err.message);
+        
+        // Si hay un error, intentar usar datos del localStorage como respaldo
+        const storedUserData = JSON.parse(localStorage.getItem(`userData_${userEmail}`) || "{}");
+        
+        if (Object.keys(storedUserData).length > 0) {
+          setUserData({
+            nombre: storedUserData.nombre || "",
+            apellido: "",
+            email: storedUserData.correo || userEmail,
+            telefono: storedUserData.telefono || "",
+            documento: storedUserData.cedula || "",
+            fechaNacimiento: storedUserData.fecha_nacimiento || "",
+            genero: storedUserData.genero || "",            direccion: "", // El backend no tiene campo direccion
+            ciudad: "",
+            imgUrl: "",            grupo_sanguineo: storedUserData.grupo_sanguineo || "",
+            alergias: storedUserData.alergias || "",
+            antecedentes_medicos: storedUserData.antecedentes_medicos || ""
+          });        } else {
+          // Si no hay datos en localStorage, usar un perfil predeterminado
+          const defaultData = {
+            nombre: userEmail.split("@")[0],
+            apellido: "",
+            email: userEmail,
+            telefono: "",
+            documento: "",
+            fechaNacimiento: "",
+            genero: "",
+            direccion: "",
+            ciudad: "",
+            imgUrl: `https://ui-avatars.com/api/?name=${userEmail.charAt(0)}&background=10B981&color=fff&size=200`
+          };
+          setUserData(defaultData);
+          // Guardar perfil predeterminado para futuras visitas
+          localStorage.setItem(`userData_${userEmail}`, JSON.stringify(defaultData));
+        }
       }
       
       setLoading(false);
-    }, 800);
+    };
+    
+    fetchUserData();
   }, [isLoggedIn, navigate]);
 
   // Iniciar edición con los datos actuales
@@ -142,8 +200,8 @@ const MiPerfil = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
     });
   };
 
-  // Guardar cambios del perfil
-  const handleSaveChanges = () => {
+  // Guardar cambios del perfil con llamada a la API
+  const handleSaveChanges = async () => {
     // Validar datos (puedes agregar más validaciones)
     if (!editedData.nombre || !editedData.email) {
       setError("Nombre y Email son campos obligatorios");
@@ -163,25 +221,64 @@ const MiPerfil = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
       return;
     }
     
-    // En una app real, enviarías estos datos a una API
     setLoading(true);
+    setError("");
     
-    setTimeout(() => {
+    try {
+      const userId = localStorage.getItem("userId");
       const userEmail = localStorage.getItem("userEmail");
-      // Actualizar datos en localStorage
-      localStorage.setItem(`userData_${userEmail}`, JSON.stringify(editedData));
+        if (!userId) {
+        throw new Error("No se encontró ID de usuario");
+      }      // Preparar datos para enviar al backend
+      const updateData = {
+        nombre: editedData.nombre,
+        telefono: editedData.telefono || "",
+        genero: editedData.genero || "",
+        fecha_nacimiento: editedData.fechaNacimiento || null,
+        // Ahora estos campos existen en la base de datos, así que los incluimos:        direccion: editedData.direccion || "",
+        grupo_sanguineo: editedData.grupo_sanguineo || "",
+        alergias: editedData.alergias || "",
+        antecedentes_medicos: editedData.antecedentes_medicos || "",
+        ciudad: editedData.ciudad || ""
+      };
+        // Enviar datos al backend
+      const token = localStorage.getItem("userToken");
+      const response = await axios.put(`${API_URL}/pacientes/${userId}`, updateData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+        // Actualizar datos locales en el estado (sin usar localStorage)
+      setUserData({
+        ...userData,
+        ...editedData,
+      });
       
-      // Si el email cambió, actualizar también la clave de sesión
-      if (editedData.email !== userData.email) {
-        localStorage.setItem("userEmail", editedData.email);
-      }
-      
-      setUserData(editedData);
+      // No guardamos en localStorage, solo usamos los datos de la base de datos
+        
       setIsEditing(false);
       setImagePreview(null);
-      setSuccess("Perfil actualizado correctamente");
+      setSuccess("¡Perfil actualizado correctamente! Todos los datos incluyendo tu información médica han sido guardados en la base de datos.");} catch (err) {
+      console.error("Error al actualizar el perfil:", err);
+      
+      // Mostrar un mensaje de error más detallado cuando hay problemas con la base de datos
+      let errorMessage = "Ha ocurrido un error al actualizar el perfil";
+      
+      if (err.response?.data?.detail) {
+        // Si el error está relacionado con columnas de la base de datos
+        if (err.response.data.detail.includes("Unknown column")) {
+          errorMessage = "No se pudo actualizar el perfil debido a un error de configuración. Algunos campos no están disponibles en la base de datos.";
+        } else {
+          errorMessage = err.response.data.detail;
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   // Cambiar contraseña
@@ -298,7 +395,7 @@ const MiPerfil = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                             <line x1="16" y1="2" x2="16" y2="6"></line>
                             <line x1="8" y1="2" x2="8" y2="6"></line>
                           </svg>
-                          DNI: {userData.documento}
+                          Cédula: {userData.documento}
                         </p>
                       )}
                     </div>
@@ -392,6 +489,52 @@ const MiPerfil = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                           Ciudad
                         </h3>
                         <p>{userData.ciudad || "No especificado"}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Sección de Información Médica */}
+                  <div className="profileDetailsSection">
+                    <h2 className="sectionTitle">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                      </svg>
+                      Información Médica
+                    </h2>
+                    
+                    <div className="detailsGrid">
+                      <div className="detailItem">
+                        <h3>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 6L6 18"></path>
+                            <path d="M6 6l12 12"></path>
+                          </svg>
+                          Grupo Sanguíneo
+                        </h3>
+                        <p>{userData.grupo_sanguineo || "No especificado"}</p>
+                      </div>
+                      
+                      <div className="detailItem fullWidth">
+                        <h3>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                          </svg>
+                          Alergias
+                        </h3>
+                        <p>{userData.alergias || "No se han registrado alergias"}</p>
+                      </div>
+                      
+                      <div className="detailItem fullWidth">
+                        <h3>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                          </svg>
+                          Antecedentes Médicos
+                        </h3>
+                        <p>{userData.antecedentes_medicos || "No se han registrado antecedentes médicos"}</p>
                       </div>
                     </div>
                   </div>
@@ -526,12 +669,10 @@ const MiPerfil = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                           <input
                             ref={fileInputRef}
                             type="file"
-                            accept="image/*"
-                            style={{ display: 'none' }}
+                            accept="image/*"                            style={{ display: 'none' }}
                             onChange={handleImageChange}
                           />
-                        </div>
-                      </div>
+                        </div>                      </div>
                       
                       <div className="formGrid">
                         <div className="formGroup">
@@ -668,9 +809,7 @@ const MiPerfil = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                           </select>
                         </div>
                         
-                        <div className="formGroup fullWidth">
-                          <label htmlFor="direccion">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <div className="formGroup fullWidth">                          <label htmlFor="direccion">                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                               <circle cx="12" cy="10" r="3"></circle>
                             </svg>
@@ -681,8 +820,7 @@ const MiPerfil = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                             id="direccion"
                             name="direccion"
                             value={editedData.direccion || ""}
-                            onChange={handleInputChange}
-                            placeholder="Ingresa tu dirección completa"
+                            onChange={handleInputChange}                            placeholder="Ingresa tu dirección completa"
                           />
                         </div>
                         
@@ -707,6 +845,60 @@ const MiPerfil = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                             placeholder="Ingresa tu ciudad"
                           />
                         </div>
+                      </div>
+                      
+                      <h3 className="sectionSubtitle">Información Médica</h3>
+                      <div className="formGroup">                        <label htmlFor="grupo_sanguineo">                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 6L6 18"></path>
+                            <path d="M6 6l12 12"></path>
+                          </svg>
+                          Grupo Sanguíneo
+                        </label>
+                        <select
+                          id="grupo_sanguineo"
+                          name="grupo_sanguineo"
+                          value={editedData.grupo_sanguineo || ""}
+                          onChange={handleInputChange}
+                        >
+                          <option value="">Seleccionar</option>
+                          <option value="O+">O+</option>
+                          <option value="O-">O-</option>
+                          <option value="A+">A+</option>
+                          <option value="A-">A-</option>
+                          <option value="B+">B+</option>                          <option value="B-">B-</option>                          <option value="AB+">AB+</option>
+                          <option value="AB-">AB-</option>
+                        </select>
+                      </div>
+                      
+                      <div className="formGroup fullWidth">                        <label htmlFor="alergias">                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                          </svg>
+                          Alergias
+                        </label>
+                        <textarea
+                          id="alergias"
+                          name="alergias"                          value={editedData.alergias || ""}
+                          onChange={handleInputChange}
+                          placeholder="Describe tus alergias conocidas (medicamentos, alimentos, etc.)"
+                          rows="3"
+                        ></textarea>
+                      </div>
+                      
+                      <div className="formGroup fullWidth">                        <label htmlFor="antecedentes_medicos">                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                          </svg>
+                          Antecedentes Médicos
+                        </label>
+                        <textarea
+                          id="antecedentes_medicos"
+                          name="antecedentes_medicos"                          value={editedData.antecedentes_medicos || ""}
+                          onChange={handleInputChange}
+                          placeholder="Describe tus antecedentes médicos relevantes"
+                          rows="3"
+                        ></textarea>
                       </div>
                     </>
                   ) : (
@@ -825,6 +1017,10 @@ const MiPerfil = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
                           </span>
                         </div>
                       </div>
+                    </div>                  )}                  
+                  {!changePassword && (
+                    <div className="noteAlert">
+                      <p>Al guardar, se actualizarán todos los campos de tu perfil incluyendo tu información personal y médica en nuestra base de datos.</p>
                     </div>
                   )}
                   
