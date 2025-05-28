@@ -3,7 +3,7 @@ import axios from "axios";
 import medicoImage from "../imgs/medicos.jpg";
 import "./AuthPages.css";
 
-const API_URL = "http://localhost:8000"; // Ajusta esto a la URL de tu API
+const API_URL = "http://localhost:8080"; 
 
 const RegisterPage = ({ navigate }) => {
   const [formData, setFormData] = useState({
