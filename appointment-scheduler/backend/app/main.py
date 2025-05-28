@@ -8,7 +8,7 @@ from pydantic import BaseModel, EmailStr, validator
 import traceback
 import time
 import hashlib
-from datetime import datetime, date
+from datetime import datetime, date, timedelta  # Añadir esta importación
 from passlib.context import CryptContext
 from .database import get_db, check_database_connection
 from .models import Usuario, Paciente, Medico, HorarioSlot, Cita
@@ -417,4 +417,143 @@ def get_pacientes(db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al obtener pacientes: {str(e)}"
+        )
+
+
+
+# Modelo para la creación de citas desde el frontend
+class CitaFrontendCreate(BaseModel):
+    patientName: str
+    patientID: str
+    patientEmail: EmailStr
+    patientPhone: str
+    date: date
+    time: str
+    typeId: str
+    typeName: str
+    duration: int
+    symptoms: str
+    status: str = "confirmada"
+
+@app.post("/agendar-cita/", status_code=status.HTTP_201_CREATED)
+def agendar_cita(
+    cita_data: CitaFrontendCreate,
+    db: Session = Depends(get_db)
+):
+    """
+    Registra una nueva cita médica desde el formulario del frontend
+    Adaptado a la estructura real de la tabla Cita
+    """
+    try:
+        print(f"Recibiendo datos de cita: {cita_data}")
+        
+        # 1. Verificar que el paciente existe por su cédula
+        paciente = db.execute(
+            text("SELECT * FROM pacientes WHERE cedula = :cedula"),
+            {"cedula": cita_data.patientID}
+        ).fetchone()
+        
+        if not paciente:
+            # Intentar buscar por correo
+            paciente = db.execute(
+                text("SELECT * FROM pacientes WHERE correo = :correo"),
+                {"correo": cita_data.patientEmail}
+            ).fetchone()
+            
+            if not paciente:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Paciente con cédula {cita_data.patientID} no encontrado. Por favor regístrese primero."
+                )
+        
+        print(f"Paciente encontrado: {paciente.id} - {paciente.nombre}")
+        
+        # 2. Generar un ID único para la cita
+        # Puedes usar un enfoque simple o más sofisticado según tus necesidades
+        import random
+        import time
+        cita_id = int(time.time() * 1000) + random.randint(1, 1000)  # Timestamp + número aleatorio
+        
+        # 3. Insertar la cita directamente usando SQL con los nombres de columna correctos
+        query = text("""
+            INSERT INTO Cita (
+                id, 
+                patient_name, 
+                patient_id, 
+                patient_email, 
+                patient_phone, 
+                appointment_date, 
+                appointment_time, 
+                type_id, 
+                type_name, 
+                duration, 
+                symptoms, 
+                status
+            )
+            VALUES (
+                :id,
+                :patient_name, 
+                :patient_id, 
+                :patient_email, 
+                :patient_phone, 
+                :appointment_date, 
+                :appointment_time, 
+                :type_id, 
+                :type_name, 
+                :duration, 
+                :symptoms, 
+                :status
+            )
+        """)
+        
+        # Formatear la hora correctamente (de string a TIME)
+        time_parts = cita_data.time.split(":")
+        formatted_time = f"{time_parts[0]}:{time_parts[1]}:00"
+        
+        # Ejecutar la consulta con los parámetros correctos
+        result = db.execute(query, {
+            "id": cita_id,
+            "patient_name": cita_data.patientName,
+            "patient_id": cita_data.patientID,
+            "patient_email": cita_data.patientEmail,
+            "patient_phone": cita_data.patientPhone,
+            "appointment_date": cita_data.date.isoformat(),
+            "appointment_time": formatted_time,
+            "type_id": cita_data.typeId,
+            "type_name": cita_data.typeName,
+            "duration": cita_data.duration,
+            "symptoms": cita_data.symptoms,
+            "status": cita_data.status
+        })
+        
+        db.commit()
+        
+        print(f"Cita creada exitosamente con ID: {cita_id}")
+        
+        # Devolver información sobre la cita
+        return {
+            "id": cita_id,
+            "patient_name": cita_data.patientName,
+            "patient_id": cita_data.patientID,
+            "patient_email": cita_data.patientEmail,
+            "appointment_date": cita_data.date,
+            "appointment_time": cita_data.time,
+            "type_name": cita_data.typeName,
+            "duration": cita_data.duration,
+            "symptoms": cita_data.symptoms,
+            "status": cita_data.status,
+            "mensaje": "Cita agendada exitosamente"
+        }
+    
+    except HTTPException as e:
+        db.rollback()
+        print(f"Error HTTP: {e.detail}")
+        raise
+    except Exception as e:
+        db.rollback()
+        print(f"Error al agendar cita: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al agendar cita: {str(e)}"
         )

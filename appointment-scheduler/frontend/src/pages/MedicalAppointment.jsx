@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./MedicalAppointment.css";
 import Navbar from "./Navbar";
+import axios from "axios"; // Asegúrate de tener axios instalado
+
+const API_URL = "http://localhost:8080"; // Ajusta esto a la URL de tu backend
 
 const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
   const [selectedDate, setSelectedDate] = useState("");
@@ -16,6 +19,7 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [timeSlotsVisible, setTimeSlotsVisible] = useState(false);
   const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
+  const [error, setError] = useState(null);
 
   // Tipos de citas disponibles
   const appointmentTypes = [
@@ -30,31 +34,47 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
     if (!isLoggedIn) {
       navigate("login");
     } else {
-      // Si está logueado, obtener email del usuario
+      // Si está logueado, obtener información del usuario desde localStorage
       const userEmail = localStorage.getItem("userEmail");
-      if (userEmail) {
-        setPatientEmail(userEmail);
-      }
+      const userName = localStorage.getItem("userName");
+      const userID = localStorage.getItem("userID");
+      
+      if (userEmail) setPatientEmail(userEmail);
+      if (userName) setPatientName(userName);
+      if (userID) setPatientID(userID);
 
       // Establecer la fecha mínima como hoy
       const today = new Date().toISOString().split("T")[0];
-      document.getElementById("appointmentDate").min = today;
+      const dateInput = document.getElementById("appointmentDate");
+      if (dateInput) {
+        dateInput.min = today;
+      }
     }
   }, [isLoggedIn, navigate]);
 
   // Generar horarios disponibles cuando la fecha cambia
-  const handleDateChange = (e) => {
+  const handleDateChange = async (e) => {
     setSelectedDate(e.target.value);
     
     if (e.target.value) {
       setTimeSlotsVisible(true);
       setLoadingTimeSlots(true);
       
-      // Simulación de carga de horarios disponibles
-      setTimeout(() => {
-        generateAvailableTimes(e.target.value);
+      try {
+        // Aquí podrías hacer una llamada a la API para obtener horarios disponibles
+        // Por ejemplo: const response = await axios.get(`${API_URL}/slots-disponibles?fecha=${e.target.value}`);
+        // Y luego: setAvailableTimes(response.data);
+        
+        // Por ahora, usamos la función de simulación
+        setTimeout(() => {
+          generateAvailableTimes(e.target.value);
+          setLoadingTimeSlots(false);
+        }, 800);
+      } catch (error) {
+        console.error("Error al cargar horarios disponibles:", error);
         setLoadingTimeSlots(false);
-      }, 800);
+        setError("No se pudieron cargar los horarios disponibles");
+      }
     } else {
       setTimeSlotsVisible(false);
     }
@@ -97,13 +117,13 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
   };
 
   // Manejar envío del formulario
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
-    // Preparar la cita
+    // Preparar la cita para enviar al backend
     const appointmentData = {
-      id: Date.now().toString(), // ID único para la cita
       patientName,
       patientID,
       patientEmail,
@@ -114,23 +134,39 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
       typeName: appointmentTypes.find((type) => type.id === selectedType).name,
       duration: appointmentTypes.find((type) => type.id === selectedType).duration,
       symptoms,
-      status: "confirmada", // Estado inicial: confirmada
-      createdAt: new Date().toISOString(), // Fecha de creación
+      status: "confirmada"
     };
 
-    console.log("Datos de la cita:", appointmentData);
+    try {
+      console.log("Intentando enviar datos a:", `${API_URL}/agendar-cita/`);
+      console.log("Datos enviados:", appointmentData);
 
-    // Guardar cita en localStorage
-    const userEmail = localStorage.getItem("userEmail");
-    const savedCitations = JSON.parse(localStorage.getItem(`citations_${userEmail}`) || "[]");
-    savedCitations.push(appointmentData);
-    localStorage.setItem(`citations_${userEmail}`, JSON.stringify(savedCitations));
-
-    // Simular envío a un servidor
-    setTimeout(() => {
+      // Hacer la llamada real al backend
+      const response = await axios.post(`${API_URL}/agendar-cita/`, appointmentData);
+      console.log("Respuesta del servidor:", response.data);
+      
+      // También guardar en localStorage como respaldo
+      const savedCitations = JSON.parse(localStorage.getItem(`citations_${patientEmail}`) || "[]");
+      savedCitations.push({
+        ...appointmentData, 
+        id: response.data.id || Date.now().toString(),
+        serverResponse: response.data // Guardar la respuesta completa del servidor
+      });
+      localStorage.setItem(`citations_${patientEmail}`, JSON.stringify(savedCitations));
+      
       setLoading(false);
       setShowSuccess(true);
-    }, 1500);
+    } catch (error) {
+      console.error("Error completo:", error);
+      console.error("Respuesta del servidor:", error.response?.data);
+      setLoading(false);
+      
+      if (error.response && error.response.data && error.response.data.detail) {
+        setError(error.response.data.detail);
+      } else {
+        setError("No se pudo agendar la cita. Por favor, intente nuevamente.");
+      }
+    }
   };
 
   // Cerrar modal de éxito
@@ -189,6 +225,28 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="appointmentForm">
+            {/* Mensaje de error */}
+            {error && (
+              <div className="errorMessage">
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="24" 
+                  height="24" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <p>{error}</p>
+              </div>
+            )}
+
             {/* Sección 1: Información Personal */}
             <div className="appointmentSection">
               <h2 className="sectionTitle">1. Información Personal</h2>

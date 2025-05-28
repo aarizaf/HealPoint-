@@ -1,6 +1,7 @@
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, Date, Time, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from datetime import datetime
 
 from .database import Base
 
@@ -19,15 +20,20 @@ class Usuario(Base):
 
 
 class Paciente(Base):
-    __tablename__ = "Paciente"
-
-    id_paciente = Column(Integer, primary_key=True, index=True)
-    id_usuario = Column(Integer, ForeignKey("Usuario.id_usuario"), nullable=False)
-    fecha_nacimiento = Column(Date)
-    genero = Column(String(20))
-    telefono = Column(String(20))
+    __tablename__ = "pacientes"
     
-    usuario = relationship("Usuario")
+    id_paciente = Column(Integer, primary_key=True, index=True)  # Asegúrate de que este sea el nombre correcto
+    nombre = Column(String(100))
+    correo = Column(String(100), unique=True)
+    cedula = Column(String(20), unique=True)
+    contraseña = Column(String(100))
+    telefono = Column(String(20))
+    genero = Column(String(20))
+    fecha_nacimiento = Column(Date)
+    fecha_registro = Column(DateTime, default=datetime.utcnow)
+    
+    # Definir la relación con Cita correctamente
+    citas = relationship("Cita", back_populates="paciente")
 
 
 class Especialidad(Base):
@@ -39,15 +45,15 @@ class Especialidad(Base):
 
 
 class Medico(Base):
-    __tablename__ = "Medico"
-
-    id_medico = Column(Integer, primary_key=True, index=True)
-    id_usuario = Column(Integer, ForeignKey("Usuario.id_usuario"), nullable=False)
-    id_especialidad = Column(Integer, ForeignKey("Especialidad.id_especialidad"), nullable=False)
-    numero_licencia = Column(String(50))
+    __tablename__ = "medicos"
     
-    usuario = relationship("Usuario")
-    especialidad = relationship("Especialidad")
+    id_medico = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String(100))
+    especialidad = Column(String(100))
+    # Otros campos relevantes
+    
+    # Definir la relación con Cita correctamente
+    citas = relationship("Cita", back_populates="medico")
 
 
 class DisponibilidadMedico(Base):
@@ -64,33 +70,38 @@ class DisponibilidadMedico(Base):
 
 
 class HorarioSlot(Base):
-    __tablename__ = "HorarioSlot"
-
+    __tablename__ = "horario_slots"
+    
     id_slot = Column(Integer, primary_key=True, index=True)
-    id_disponibilidad = Column(Integer, ForeignKey("DisponibilidadMedico.id_disponibilidad"), nullable=False)
+    id_disponibilidad = Column(Integer)
     fecha = Column(Date)
     hora_inicio = Column(Time)
     hora_fin = Column(Time)
-    estado = Column(Enum('disponible', 'reservado', 'bloqueado'), default='disponible')
+    estado = Column(String(20), default="disponible")  # disponible, reservado, cancelado
     
-    disponibilidad = relationship("DisponibilidadMedico")
+    # Definir la relación con Cita correctamente
+    cita = relationship("Cita", back_populates="slot", uselist=False)
 
 
+# Agregar a models.py
 class Cita(Base):
-    __tablename__ = "Cita"
-
-    id_cita = Column(Integer, primary_key=True, index=True)
-    id_paciente = Column(Integer, ForeignKey("Paciente.id_paciente"), nullable=False)
-    id_medico = Column(Integer, ForeignKey("Medico.id_medico"), nullable=False)
-    id_slot = Column(Integer, ForeignKey("HorarioSlot.id_slot"), nullable=False)
-    motivo = Column(Text)
-    nota_medica = Column(Text)
-    estado = Column(Enum('pendiente', 'confirmada', 'cancelada', 'completada'), default='pendiente')
-    id_pago = Column(Integer)
+    __tablename__ = "cita"
     
-    paciente = relationship("Paciente")
-    medico = relationship("Medico")
-    slot = relationship("HorarioSlot")
+    id_cita = Column(Integer, primary_key=True, index=True)
+    # Asegúrate de que estos nombres coincidan con las columnas en tu base de datos
+    id_paciente = Column(Integer, ForeignKey("pacientes.id_paciente"))
+    id_medico = Column(Integer, ForeignKey("medicos.id_medico"))
+    id_slot = Column(Integer, ForeignKey("horario_slots.id_slot"))
+    motivo = Column(String(500))
+    estado = Column(String(50), default="pendiente")
+    fecha_creacion = Column(DateTime, default=datetime.utcnow)
+    tipo_consulta = Column(String(100))
+    duracion = Column(Integer)
+    
+    # Definir las relaciones correctamente
+    paciente = relationship("Paciente", back_populates="citas")
+    medico = relationship("Medico", back_populates="citas")
+    slot = relationship("HorarioSlot", back_populates="cita")
 
 
 class Pago(Base):
