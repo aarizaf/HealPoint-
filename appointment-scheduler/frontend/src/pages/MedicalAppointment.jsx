@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./MedicalAppointment.css";
 import Navbar from "./Navbar";
+import PaymentGateway from "../components/PaymentGateway";
 import axios from "axios"; // Asegúrate de tener axios instalado
 
 const API_URL = "http://localhost:8080"; // Ajusta esto a la URL de tu backend
@@ -20,6 +21,10 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
   const [timeSlotsVisible, setTimeSlotsVisible] = useState(false);
   const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
   const [error, setError] = useState(null);
+  // Estados para el proceso de pago
+  const [showPaymentGateway, setShowPaymentGateway] = useState(false);
+  const [appointmentData, setAppointmentData] = useState(null);
+  const [paymentInfo, setPaymentInfo] = useState(null);
 
   // Tipos de citas disponibles
   const appointmentTypes = [
@@ -115,7 +120,6 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
   const handleTimeSelection = (time) => {
     setSelectedTime(time);
   };
-
   // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -134,45 +138,68 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
       typeName: appointmentTypes.find((type) => type.id === selectedType).name,
       duration: appointmentTypes.find((type) => type.id === selectedType).duration,
       symptoms,
-      status: "confirmada"
+      status: "pendiente", // Cambiar estado a pendiente hasta que se complete el pago
+      formattedDate: formatDate(selectedDate) // Añadimos la fecha formateada para mostrar en el resumen
     };
 
+    // Guardar datos de la cita y mostrar pasarela de pago
+    setAppointmentData(appointmentData);
+    setShowPaymentGateway(true);
+    setLoading(false);
+  };
+  // Cerrar modal de éxito
+  const closeSuccessModal = () => {
+    setShowSuccess(false);
+    navigate("home");
+  };
+  
+  // Manejar pago exitoso
+  const handlePaymentSuccess = async (paymentResponse) => {
+    setPaymentInfo(paymentResponse);
+    setLoading(true);
+    
     try {
-      console.log("Intentando enviar datos a:", `${API_URL}/agendar-cita/`);
-      console.log("Datos enviados:", appointmentData);
-
+      // Actualizar estado de la cita a confirmada
+      const finalAppointmentData = {
+        ...appointmentData,
+        status: "confirmada",
+        paymentInfo: {
+          transactionId: paymentResponse.transactionId,
+          amount: paymentResponse.amount,
+          date: paymentResponse.date
+        }
+      };
+      
+      console.log("Enviando datos de cita con pago confirmado:", finalAppointmentData);
+      
       // Hacer la llamada real al backend
-      const response = await axios.post(`${API_URL}/agendar-cita/`, appointmentData);
+      const response = await axios.post(`${API_URL}/agendar-cita/`, finalAppointmentData);
       console.log("Respuesta del servidor:", response.data);
       
       // También guardar en localStorage como respaldo
       const savedCitations = JSON.parse(localStorage.getItem(`citations_${patientEmail}`) || "[]");
       savedCitations.push({
-        ...appointmentData, 
+        ...finalAppointmentData, 
         id: response.data.id || Date.now().toString(),
         serverResponse: response.data // Guardar la respuesta completa del servidor
       });
       localStorage.setItem(`citations_${patientEmail}`, JSON.stringify(savedCitations));
       
-      setLoading(false);
+      // Ocultar pasarela de pago y mostrar mensaje de éxito
+      setShowPaymentGateway(false);
       setShowSuccess(true);
-    } catch (error) {
-      console.error("Error completo:", error);
-      console.error("Respuesta del servidor:", error.response?.data);
       setLoading(false);
-      
-      if (error.response && error.response.data && error.response.data.detail) {
-        setError(error.response.data.detail);
-      } else {
-        setError("No se pudo agendar la cita. Por favor, intente nuevamente.");
-      }
+    } catch (error) {
+      console.error("Error al confirmar la cita después del pago:", error);
+      setLoading(false);
+      setError("El pago fue procesado, pero hubo un problema al confirmar la cita. Por favor, contacte a soporte.");
     }
   };
-
-  // Cerrar modal de éxito
-  const closeSuccessModal = () => {
-    setShowSuccess(false);
-    navigate("home");
+  
+  // Cancelar proceso de pago
+  const handlePaymentCancel = () => {
+    setShowPaymentGateway(false);
+    setAppointmentData(null);
   };
 
   // Formatear fecha para mostrar en formato amigable - Corregido para zona horaria
@@ -511,9 +538,7 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
             </div>
           </form>
         </div>
-      </div>
-
-      {/* Modal de éxito */}
+      </div>      {/* Modal de éxito */}
       {showSuccess && (
         <div className="successModal">
           <div className="successModalContent">
@@ -538,11 +563,26 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
               Su cita ha sido programada para el {formatDate(selectedDate)} a las {selectedTime}. 
               Recibirá un correo de confirmación con los detalles en breve.
             </p>
+            {paymentInfo && (
+              <div className="paymentConfirmation">
+                <p>Pago procesado correctamente</p>
+                <p className="transactionId">ID de transacción: {paymentInfo.transactionId}</p>
+              </div>
+            )}
             <button className="returnButton" onClick={closeSuccessModal}>
               Volver al Inicio
             </button>
           </div>
         </div>
+      )}
+      
+      {/* Pasarela de pago */}
+      {showPaymentGateway && appointmentData && (
+        <PaymentGateway 
+          appointmentData={appointmentData}
+          onPaymentSuccess={handlePaymentSuccess}
+          onCancel={handlePaymentCancel}
+        />
       )}
     </>
   );
