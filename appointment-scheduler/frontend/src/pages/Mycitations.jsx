@@ -65,81 +65,58 @@ const MyCitations = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
     }
   }, [selectedDate, showRescheduleModal]);
 
-  // Formatear fecha para mostrar
+  // Formatear fecha para mostrar - Corregido para zona horaria
   const formatDate = (dateString) => {
     if (!dateString) return "";
-    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-    return new Date(dateString).toLocaleDateString("es-ES", options);
+    
+    // Aseguramos que la fecha se interprete correctamente independientemente de la zona horaria
+    const parts = dateString.split('-');
+    const year = parseInt(parts[0]);
+    const month = parseInt(parts[1]) - 1; // Los meses en JavaScript son 0-indexados
+    const day = parseInt(parts[2]);
+    
+    // Crear la fecha en la zona horaria local sin ajustes UTC
+    const date = new Date(year, month, day);
+    
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    };
+    
+    return date.toLocaleDateString("es-ES", options);
   };
 
-  // Manejar reprogramación de cita
-  const handleReschedule = (citation) => {
-    setSelectedCitation(citation);
-    setSelectedDate("");
-    setSelectedTime("");
-    setShowRescheduleModal(true);
+  // Comparar fechas sin considerar la hora - Solución para el filtrado
+  const compareDatesOnly = (dateString) => {
+    if (!dateString) return new Date(0); // Fecha mínima si no hay fecha
+    
+    // Crear una fecha local sin problemas de zona horaria
+    const parts = dateString.split('-');
+    const year = parseInt(parts[0]);
+    const month = parseInt(parts[1]) - 1;
+    const day = parseInt(parts[2]);
+    
+    return new Date(year, month, day);
   };
 
-  // Manejar cancelación de cita
-  const handleCancelRequest = (citation) => {
-    setSelectedCitation(citation);
-    setShowCancelModal(true);
+  // Obtener la fecha actual sin la hora
+  const getCurrentDateWithoutTime = () => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
   };
 
-  // Confirmar reprogramación
-  const confirmReschedule = () => {
-    if (!selectedDate || !selectedTime) return;
-    
-    const userEmail = localStorage.getItem("userEmail");
-    const updatedCitations = citations.map(cita => {
-      if (cita.id === selectedCitation.id) {
-        return {
-          ...cita,
-          date: selectedDate,
-          time: selectedTime,
-          status: "reprogramada",
-          updatedAt: new Date().toISOString()
-        };
-      }
-      return cita;
-    });
-    
-    localStorage.setItem(`citations_${userEmail}`, JSON.stringify(updatedCitations));
-    setCitations(updatedCitations);
-    setShowRescheduleModal(false);
-    
-    // Mostrar notificación
-    alert("Cita reprogramada exitosamente para " + formatDate(selectedDate) + " a las " + selectedTime);
-  };
-
-  // Confirmar cancelación
-  const confirmCancel = () => {
-    const userEmail = localStorage.getItem("userEmail");
-    const updatedCitations = citations.map(cita => {
-      if (cita.id === selectedCitation.id) {
-        return {
-          ...cita,
-          status: "cancelada",
-          updatedAt: new Date().toISOString()
-        };
-      }
-      return cita;
-    });
-    
-    localStorage.setItem(`citations_${userEmail}`, JSON.stringify(updatedCitations));
-    setCitations(updatedCitations);
-    setShowCancelModal(false);
-    
-    // Mostrar notificación
-    alert("Cita cancelada exitosamente");
-  };
-
-  // Filtrar citas según la pestaña activa
+  // Filtrar citas según la pestaña activa - Corregido para zona horaria
   const filteredCitations = citations.filter(citation => {
+    // Usar nuestras funciones auxiliares para comparar fechas sin problemas de zona horaria
+    const citationDate = compareDatesOnly(citation.date);
+    const today = getCurrentDateWithoutTime();
+    
     if (activeTab === "upcoming") {
-      return citation.status !== "cancelada" && new Date(citation.date) >= new Date().setHours(0,0,0,0);
+      return citation.status !== "cancelada" && citationDate >= today;
     } else if (activeTab === "past") {
-      return citation.status !== "cancelada" && new Date(citation.date) < new Date().setHours(0,0,0,0);
+      return citation.status !== "cancelada" && citationDate < today;
     } else {
       return citation.status === "cancelada";
     }
@@ -157,6 +134,76 @@ const MyCitations = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
       default:
         return "";
     }
+  };
+
+  // Manejar solicitud de reprogramación
+  const handleReschedule = (citation) => {
+    setSelectedCitation(citation);
+    setSelectedDate("");
+    setSelectedTime("");
+    setShowRescheduleModal(true);
+  };
+
+  // Manejar solicitud de cancelación
+  const handleCancelRequest = (citation) => {
+    setSelectedCitation(citation);
+    setShowCancelModal(true);
+  };
+
+  // Confirmar reprogramación de cita
+  const confirmReschedule = () => {
+    if (!selectedDate || !selectedTime || !selectedCitation) return;
+    
+    // Actualizar la cita en el array
+    const updatedCitations = citations.map(cit => {
+      if (cit.id === selectedCitation.id) {
+        return {
+          ...cit,
+          date: selectedDate,
+          time: selectedTime,
+          status: "reprogramada"
+        };
+      }
+      return cit;
+    });
+    
+    // Guardar en localStorage
+    const userEmail = localStorage.getItem("userEmail");
+    localStorage.setItem(`citations_${userEmail}`, JSON.stringify(updatedCitations));
+    
+    // Actualizar estado
+    setCitations(updatedCitations);
+    setShowRescheduleModal(false);
+    
+    // Mostrar mensaje de éxito (puedes implementar un toast o alerta)
+    alert("Cita reprogramada exitosamente para el " + formatDate(selectedDate) + " a las " + selectedTime);
+  };
+
+  // Confirmar cancelación de cita
+  const confirmCancel = () => {
+    if (!selectedCitation) return;
+    
+    // Actualizar la cita en el array
+    const updatedCitations = citations.map(cit => {
+      if (cit.id === selectedCitation.id) {
+        return {
+          ...cit,
+          status: "cancelada"
+        };
+      }
+      return cit;
+    });
+    
+    // Guardar en localStorage
+    const userEmail = localStorage.getItem("userEmail");
+    localStorage.setItem(`citations_${userEmail}`, JSON.stringify(updatedCitations));
+    
+    // Actualizar estado
+    setCitations(updatedCitations);
+    setShowCancelModal(false);
+    
+    // Mostrar mensaje de éxito (puedes implementar un toast o alerta)
+    alert("Cita cancelada exitosamente");
   };
 
   return (

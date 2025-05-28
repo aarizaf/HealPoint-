@@ -10,7 +10,6 @@ import {
   Twitter,
   Instagram,
   Linkedin,
-  Twitch,
 } from "lucide-react";
 
 const ContactPage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
@@ -42,7 +41,7 @@ const ContactPage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
               <div class="contactInfoContent">
                 <div class="contactInfoTitle">Dirección</div>
                 <div class="contactInfoText">
-                  Av. Principal 123, Ciudad, País
+                  Barranquilla, Colombia
                 </div>
               </div>
             </div>
@@ -53,7 +52,7 @@ const ContactPage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
               </div>
               <div class="contactInfoContent">
                 <div class="contactInfoTitle">Teléfono</div>
-                <div class="contactInfoText">+1 234 567 8900</div>
+                <div class="contactInfoText">+57 3053303077</div>
               </div>
             </div>
 
@@ -63,7 +62,7 @@ const ContactPage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
               </div>
               <div class="contactInfoContent">
                 <div class="contactInfoTitle">Email</div>
-                <div class="contactInfoText">info@tuempresa.com</div>
+                <div class="contactInfoText">info@healpoint.com</div>
               </div>
             </div>
 
@@ -78,16 +77,36 @@ const ContactPage = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
             </div>
 
             <div class="socialLinks">
-              <a href="#" class="socialLink">
+              <a
+                href="https://facebook.com/healpoint"
+                class="socialLink"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Facebook size={20} color="#10b981" />
               </a>
-              <a href="#" class="socialLink">
+              <a
+                href="https://twitter.com/healpoint"
+                class="socialLink"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Twitter size={20} color="#10b981" />
               </a>
-              <a href="#" class="socialLink">
+              <a
+                href="https://instagram.com/healpoint"
+                class="socialLink"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Instagram size={20} color="#10b981" />
               </a>
-              <a href="#" class="socialLink">
+              <a
+                href="https://linkedin.com/company/healpoint"
+                class="socialLink"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Linkedin size={20} color="#10b981" />
               </a>
             </div>

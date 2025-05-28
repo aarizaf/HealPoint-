@@ -175,16 +175,27 @@ const MedicalAppointment = ({ navigate, isLoggedIn, setIsLoggedIn }) => {
     navigate("home");
   };
 
-  // Formatear fecha para mostrar en formato amigable
+  // Formatear fecha para mostrar en formato amigable - Corregido para zona horaria
   const formatDate = (dateString) => {
     if (!dateString) return "";
+    
+    // Aseguramos que la fecha se interprete correctamente independientemente de la zona horaria
+    const parts = dateString.split('-');
+    const year = parseInt(parts[0]);
+    const month = parseInt(parts[1]) - 1; // Los meses en JavaScript son 0-indexados
+    const day = parseInt(parts[2]);
+    
+    // Crear la fecha en la zona horaria local sin ajustes UTC
+    const date = new Date(year, month, day);
+    
     const options = {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
     };
-    return new Date(dateString).toLocaleDateString("es-ES", options);
+    
+    return date.toLocaleDateString("es-ES", options);
   };
 
   // Verificar si el formulario está completo
