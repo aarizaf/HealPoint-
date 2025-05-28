@@ -1,0 +1,602 @@
+/* Medicamentos.css - Estilos para el directorio de medicamentos */
+
+.medicamentosContainer {
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: calc(100vh - 64px);
+  max-width: 1200px;
+}
+
+.medicamentosHeader {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.medicamentosHeader h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.medicamentosHeader p {
+  font-size: 1.1rem;
+  color: var(--text-light);
+}
+
+/* Filtros y búsqueda */
+.medicamentosFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.searchBar {
+  flex: 0.7;
+  position: relative;
+  min-width: 300px;
+  max-width: 600px;
+  margin-right: 20px;
+}
+
+.searchBar input {
+  width: 100%;
+  padding: 0.875rem 2.5rem 0.875rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  color: var(--text);
+}
+
+.searchBar input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.searchBar svg {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--text-light);
+}
+
+.categoryFilter {
+  width: 240px;
+  flex-shrink: 0;
+}
+
+.categoryFilter select {
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background-color: white;
+  font-size: 1rem;
+  color: var(--text);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+}
+
+.categoryFilter select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+/* Lista de medicamentos */
+.medicationsList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.medicationCard {
+  background-color: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.medicationCard:hover {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.medicationCardHeader {
+  position: relative;
+  padding: 1.5rem 1.5rem 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.medicationCardImage {
+  width: 100%;
+  height: 140px; /* Aumentado de un valor probable de 120px */
+  margin-bottom: 12px;
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.medicationImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.medicationCardBadges {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.prescriptionBadge, .outOfStockBadge {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prescriptionBadge {
+  background-color: #ffe4e6;
+  color: #e11d48;
+}
+
+.outOfStockBadge {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.medicationCardBody {
+  padding: 1rem 1.5rem;
+  flex-grow: 1;
+}
+
+.medicationCardCategory {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  background-color: rgba(16, 185, 129, 0.1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.medicationCardName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.medicationCardBrand {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  margin-bottom: 0.75rem;
+}
+
+.medicationCardInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.medicationDosage {
+  font-size: 0.875rem;
+  color: var(--text);
+}
+
+.medicationCardAvailability {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-light);
+}
+
+.medicationCardAvailability svg {
+  stroke: currentColor;
+  margin-right: 0.25rem;
+}
+
+.availabilityStatus {
+  font-weight: 600;
+}
+
+/* Estilos para los estados de disponibilidad */
+.availabilityHigh {
+  color: #10B981; /* verde */
+}
+
+.availabilityMedium {
+  color: #FBBF24; /* amarillo */
+}
+
+.availabilityLow {
+  color: #F87171; /* rojo */
+}
+
+.medicationCardFooter {
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.viewDetailBtn {
+  width: 100%;
+  background-color: white;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.viewDetailBtn:hover {
+  background-color: #f9fafb;
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+
+/* Vista detallada */
+.medicationDetailCard {
+  background-color: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.closeDetailBtn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-light);
+  transition: all 0.2s ease;
+}
+
+.closeDetailBtn:hover {
+  background-color: #f3f4f6;
+  color: var(--text);
+}
+
+.medicationDetailHeader {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.medicationImageContainer {
+  width: 280px; /* Aumentado de un valor probable de 240px */
+  height: 210px; /* Aumentado de un valor probable de 180px */
+  margin-right: 24px;
+  flex-shrink: 0;
+}
+
+.medicationPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f4f6;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.medicationDetailInfo {
+  flex-grow: 1;
+}
+
+.medicationTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.medicationTitleRow h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.medicationCategory {
+  display: inline-block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+  background-color: rgba(16, 185, 129, 0.1);
+  padding: 0.35rem 0.85rem;
+  border-radius: 2rem;
+}
+
+.medicationBrand {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  margin-bottom: 1rem;
+}
+
+.medicationProperties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.medicationProperty {
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.medicationAvailability {
+  background-color: #f3f4f6;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.availabilityLabel {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-right: 0.5rem;
+}
+
+.availabilityDays {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.medicationStatus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.prescriptionRequired, .noPreRequisites, .inStock, .outOfStock {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.prescriptionRequired {
+  background-color: #ffe4e6;
+  color: #e11d48;
+}
+
+.noPreRequisites {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.inStock {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.outOfStock {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.medicationDetailBody {
+  margin-top: 2rem;
+}
+
+.detailSection {
+  margin-bottom: 1.5rem;
+}
+
+.detailSection h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+}
+
+.detailSection p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.infoNote {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-radius: 0.5rem;
+  color: var(--text-light);
+  align-items: flex-start;
+  border: 1px solid #e2e8f0;
+}
+
+.infoNote svg {
+  color: #3b82f6;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.infoNote p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Estado de carga */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  grid-column: 1 / -1;
+  color: var(--text-light);
+}
+
+.loadingSpinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid var(--primary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Sin resultados */
+.noResultsContainer {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  color: var(--text-light);
+  text-align: center;
+}
+
+.noResultsContainer svg {
+  color: #d1d5db;
+  margin-bottom: 1.5rem;
+}
+
+.noResultsContainer h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.noResultsContainer p {
+  font-size: 1rem;
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+}
+
+.noResultsContainer button {
+  background-color: white;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.noResultsContainer button:hover {
+  background-color: #f9fafb;
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .medicationDetailHeader {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .medicationImageContainer {
+    width: 100%;
+    height: 200px;
+    margin-right: 0;
+    margin-bottom: 16px;
+  }
+  
+  .medicamentosFilters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .searchBar {
+    flex: 1;
+    max-width: 100%;
+    margin-right: 0;
+  }
+  
+  .categoryFilter {
+    width: 100%;
+  }
+  
+  .medicationProperties {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .medicationStatus {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+:root {
+  --primary: #10B981;
+  --primary-light: #D1FAE5;
+  --text: #1F2937;
+  --text-light: #6B7280;
+  --border: #E5E7EB;
+}
+
+.medicationImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.medicationDetailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}

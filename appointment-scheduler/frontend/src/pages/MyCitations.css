@@ -1,0 +1,455 @@
+.myCitationsContainer {
+  min-height: calc(100vh - 72px); /* Ajustar para que funcione con la Navbar */
+  background: #F3F4F6;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+}
+
+.myCitationsCard {
+  max-width: 800px;
+  width: 100%;
+  padding: 2.5rem;
+  background: #FFFFFF;
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  position: relative;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.myCitationsCard::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 6px;
+  background: linear-gradient(135deg, #10B981, #059669);
+  border-radius: 1rem 1rem 0 0;
+}
+
+.myCitationsHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.pageTitle {
+  font-size: 1.9rem; 
+  font-weight: 800; 
+  color: #111827;
+  margin: 0.5rem 0;
+  letter-spacing: -0.75px;
+  line-height: 1.2;
+}
+
+.pageSubtitle {
+  font-size: 0.95rem; 
+  color: #4B5563; 
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+/* Tabs para filtrar citas */
+.tabsContainer {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #E5E7EB;
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #6B7280;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  position: relative;
+}
+
+.tab:after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: transparent;
+  transition: background 0.3s ease;
+}
+
+.tab.active {
+  color: #10B981;
+  font-weight: 600;
+}
+
+.tab.active:after {
+  background: #10B981;
+}
+
+.tab:hover {
+  color: #059669;
+}
+
+/* Lista de citas */
+.citationsListContainer {
+  min-height: 300px;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.emptyCitations {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  padding: 2rem;
+  color: #6B7280;
+}
+
+.emptyIcon {
+  color: #9CA3AF;
+  margin-bottom: 1rem;
+}
+
+.citationsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.citationCard {
+  border: 1px solid #E5E7EB;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+  background: #FFFFFF;
+}
+
+.citationCard:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transform: translateY(-2px);
+}
+
+.citationHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.citationStatus {
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  border-radius: 9999px;
+}
+
+.statusConfirmed {
+  color: #10B981;
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.statusRescheduled {
+  color: #F59E0B;
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.statusCancelled {
+  color: #EF4444;
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.citationType {
+  font-weight: 500;
+  color: #6B7280;
+}
+
+.citationDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.citationDetail {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.citationDetail svg {
+  color: #10B981;
+}
+
+.citationSymptoms {
+  font-size: 0.95rem;
+  margin-bottom: 1.25rem;
+  color: #4B5563;
+}
+
+.citationActions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.rescheduleButton {
+  background-color: #F3F4F6;
+  color: #4B5563;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.rescheduleButton:hover {
+  background-color: #E5E7EB;
+  color: #111827;
+}
+
+.cancelButton {
+  background-color: #FEF2F2;
+  color: #EF4444;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.cancelButton:hover {
+  background-color: #FEE2E2;
+}
+
+.newCitationButtonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.newCitationButton {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+  border: none;
+  padding: 0.85rem 2rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.newCitationButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+}
+
+/* Estilos para modales */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px);
+}
+
+.modalContent {
+  background: white;
+  border-radius: 0.75rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: fadeInUp 0.3s ease;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.modalHeader h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #9CA3AF;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+}
+
+.closeButton:hover {
+  color: #6B7280;
+  background-color: #F3F4F6;
+}
+
+.modalBody {
+  padding: 1.5rem;
+}
+
+.modalInfo {
+  margin-bottom: 1.5rem;
+  color: #4B5563;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.cancelWarning {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #EF4444;
+}
+
+.cancelInfo {
+  background-color: #F9FAFB;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cancelPolicy {
+  font-size: 0.85rem;
+  color: #6B7280;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border-top: 1px solid #E5E7EB;
+}
+
+.secondaryButton {
+  background-color: white;
+  border: 1px solid #E5E7EB;
+  color: #6B7280;
+  font-weight: 500;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.secondaryButton:hover {
+  border-color: #D1D5DB;
+  color: #4B5563;
+  background-color: #F9FAFB;
+}
+
+.primaryButton {
+  background-color: #10B981;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.primaryButton:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+.primaryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dangerButton {
+  background-color: #EF4444;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dangerButton:hover {
+  background-color: #DC2626;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .myCitationsCard {
+    padding: 1.5rem;
+  }
+  
+  .tab {
+    padding: 0.75rem 1rem;
+  }
+  
+  .citationHeader {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .citationStatus {
+    align-self: flex-start;
+  }
+  
+  .citationActions {
+    flex-direction: column;
+  }
+  
+  .modalContent {
+    width: 95%;
+  }
+  
+  .timeSlotGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
